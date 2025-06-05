@@ -65,10 +65,9 @@ function RouteComponent() {
 
               return (
                 <HeaderField
-                  classified={field.classified}
+                  key={field.name}
+                  field={field}
                   icon={icon}
-                  label={field.label}
-                  name={field.name}
                   description={description}
                 />
               );

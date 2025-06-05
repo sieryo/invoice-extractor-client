@@ -24,7 +24,6 @@ export const PDFAnnotator = () => {
     config
   } = usePdfStore()
 
-  console.log(config)
   const [boxes, setBoxes] = useState<BoxState[]>([]);
   const { currentBox, handleMouseMove, handleClick } = useBox();
 
@@ -36,7 +35,7 @@ export const PDFAnnotator = () => {
     console.log(file);
   }, [file]);
 
-  const { type } = useActiveFieldStore();
+  const { field, type } = useActiveFieldStore();
 
   return (
     <div

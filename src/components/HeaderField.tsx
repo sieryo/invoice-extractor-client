@@ -1,34 +1,54 @@
 import { Label } from "./ui/label";
-import { ClassifiedTypeEnum, type Classified } from "@/models/pdfConfig";
+import { Pencil } from "lucide-react";
+import { ClassifiedTypeEnum, type FieldPdfConfig } from "@/models/pdfConfig";
 import { mapClassifiedTypeEnum } from "@/lib/helper";
 import { Input } from "./ui/input";
 import { DrawButton } from "./DrawButton";
+import { ClassKeyword } from "./ClassKeyword";
+import { useState } from "react";
+import { ClassLine } from "./ClassLine";
+import { ClassBoxArea } from "./ClassBoxArea";
 
 export const HeaderField = ({
-  name,
-  label,
+  field,
   icon,
-  classified,
   description,
 }: {
-  name: string;
-  label: string;
+  field: FieldPdfConfig;
   icon: React.ReactNode;
-  classified: Classified;
   description?: string;
 }) => {
-  const classifiedData = classified.data;
-  const classifiedMethod = classified.method;
+  const classifiedData = field.classified.data;
+  const classifiedMethod = field.classified.method;
+  const label = field.label;
+  const name = field.name;
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleIsEditing = (state: boolean) => {
+    setIsEditing(state);
+  };
 
   const desc = (
     <span className="text-xs">
-      {description} {label}
+      {description} {field.label}
     </span>
   );
 
   return (
-    <div className="flex gap-3 items-start p-1.5 pb-5 border-b border-b-gray-200 ">
-      {/* ICON */}
+    <div className="relative flex gap-3 items-start p-1.5 pb-5 border-b border-b-gray-200">
+      {classifiedMethod !== ClassifiedTypeEnum.BOX && (
+        <button
+          className="absolute top-1.5 right-1.5 text-gray-700 hover:text-blue-500"
+          title="Edit"
+          onClick={() => {
+            handleIsEditing(true);
+          }}
+        >
+          <Pencil className="w-4 h-4" />
+        </button>
+      )}
+
+      {/* ICON UTAMA */}
       <div className="w-9 h-9 flex items-center justify-center bg-gray-50 border rounded-md mt-1">
         {icon}
       </div>
@@ -45,26 +65,28 @@ export const HeaderField = ({
           {desc}
         </p>
 
-        {/* ACTUAL VALUE... */}
+        {/* NILAI */}
         <div>
-          {classifiedMethod == ClassifiedTypeEnum.KEYWORD && (
-            <Input
-              disabled
-              className="mt-2"
-              placeholder="Contoh: No. Invoice, Invoice no"
-              value={classifiedData ?? ""}
+          {classifiedMethod === ClassifiedTypeEnum.KEYWORD && (
+            <ClassKeyword
+              isEditing={isEditing}
+              setIsEditing={handleIsEditing}
+              field={field}
+              description={desc}
             />
           )}
 
-          {classifiedMethod == ClassifiedTypeEnum.LINE && (
-            <div className="mt-2 flex gap-2">
-              <Input className="w-full max-w-[150px]" placeholder="Line from" disabled value={classifiedData[0] ?? ""} />
-              <Input className="w-full max-w-[150px]" placeholder="Line to" disabled  value={classifiedData[1] ?? ""}/>
-            </div>
+          {classifiedMethod === ClassifiedTypeEnum.LINE && (
+            <ClassLine
+              isEditing={isEditing}
+              setIsEditing={handleIsEditing}
+              field={field}
+              description={desc}
+            />
           )}
 
-          {classifiedMethod == ClassifiedTypeEnum.BOX && (
-            <DrawButton name={name} />
+          {classifiedMethod === ClassifiedTypeEnum.BOX && (
+            <ClassBoxArea field={field} />
           )}
         </div>
       </div>

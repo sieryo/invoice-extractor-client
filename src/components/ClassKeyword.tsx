@@ -1,0 +1,105 @@
+import { usePdfStore } from "@/store/usePdfStore";
+import { Input } from "./ui/input";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import type { FieldPdfConfig } from "@/models/pdfConfig";
+
+export const ClassKeyword = ({
+  isEditing,
+  setIsEditing,
+  field,
+  description,
+}: {
+  description: React.ReactElement;
+  field: FieldPdfConfig;
+  isEditing: boolean;
+  setIsEditing: (state: boolean) => void;
+}) => {
+  const [value, setValue] = useState("");
+  const data = field.classified.data as any;
+  const { config, setConfig } = usePdfStore();
+
+  const handleUpdate = () => {
+    const newValue = value.trim() !== "" ? value : data;
+    const updatedField: FieldPdfConfig = {
+      ...field,
+      classified: {
+        ...field.classified,
+        data: newValue,
+      },
+    };
+
+    const index = config.sections.header.fields.findIndex(
+      (f) => f.name === field.name
+    );
+    if (index !== -1) {
+      const newConfig = config;
+      newConfig.sections.header.fields[index] = updatedField;
+      setConfig(newConfig);
+    }
+
+    setIsEditing(false);
+  };
+
+  useEffect(() => {
+    setValue(data);
+  }, [isEditing]);
+
+  const handleChange = (e: any) => {
+    const value = e.target.value;
+
+    setValue(value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && value.trim() !== "") {
+      handleUpdate();
+    }
+  };
+
+  return (
+    <div>
+      <Dialog
+        open={isEditing}
+        onOpenChange={() => {
+          setIsEditing(false);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Keyword</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
+
+            <Input
+              className="mt-2 "
+              placeholder={`Example: ${data}`}
+              value={value}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+            />
+          </DialogHeader>
+
+          <div className=" pt-4 flex justify-end ">
+            <Button onClick={handleUpdate} className=" bg-green-700 px-8">
+              Save
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Input
+        disabled
+        className="mt-2"
+        placeholder={`Example: ${data}`}
+        value={data}
+      />
+    </div>
+  );
+};
