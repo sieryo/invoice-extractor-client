@@ -19,7 +19,7 @@ export type Box = {
 
 export type Classified = {
   method: ClassifiedTypeEnum;
-  data: [number, number] | string[] | Box;
+  data: [number, number] | string | Box;
   isMultiwords?: boolean
 };
 

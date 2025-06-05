@@ -31,7 +31,7 @@ export class PdfConfigManager {
         label: "Invoice Number",
         classified: {
           method: ClassifiedTypeEnum.KEYWORD,
-          data: ["Invoice No", "No. Invoice"],
+          data: "No. Invoice",
         },
       },
       {
@@ -39,7 +39,7 @@ export class PdfConfigManager {
         label: "Invoice Date",
         classified: {
           method: ClassifiedTypeEnum.KEYWORD,
-          data: ["Invoice Date", "Date"],
+          data: "Invoice Date",
         },
       },
       {
@@ -76,7 +76,7 @@ export class PdfConfigManager {
         label: "Buyer Name",
         classified: {
           method: ClassifiedTypeEnum.KEYWORD,
-          data: ["Delivery to", "Customer Name"],
+          data: "Customer Name",
           isMultiwords: true,
         },
       },
@@ -108,7 +108,7 @@ export class PdfConfigManager {
   }
 
   changeExportedName(exportedName: string) {
-    this.config.exportedName = exportedName
+    this.config.exportedName = exportedName;
   }
 
   getConfig(): PdfConfig {
@@ -124,9 +124,8 @@ export class PdfConfigManager {
   }
 
   removeHeaderFieldByName(name: string): void {
-    this.config.sections.header.fields = this.config.sections.header.fields.filter(
-      (f) => f.name !== name
-    );
+    this.config.sections.header.fields =
+      this.config.sections.header.fields.filter((f) => f.name !== name);
   }
 
   // =======================
@@ -138,9 +137,8 @@ export class PdfConfigManager {
   }
 
   removeTableFieldByName(name: string): void {
-    this.config.sections.table.tableHeader = this.config.sections.table.tableHeader.filter(
-      (f) => f.name !== name
-    );
+    this.config.sections.table.tableHeader =
+      this.config.sections.table.tableHeader.filter((f) => f.name !== name);
   }
 
   setExtractFields(fields: string[]): void {
