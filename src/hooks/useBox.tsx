@@ -6,26 +6,31 @@ export type BoxState = null | {
   y: number;
   width: number;
   height: number;
+  stroke?: string;
 };
 
 export const useBox = () => {
   const [currentBox, setCurrentBox] = useState<BoxState>(null);
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
 
-  const handleClick = (e: Konva.KonvaEventObject<MouseEvent>, onComplete: (box: BoxState) => void) => {
+  const handleClick = (
+    e: Konva.KonvaEventObject<MouseEvent>,
+    onComplete: (box: BoxState) => void,
+    scale = 1 // ⬅️ Tambahan scale default
+  ) => {
     const stage = e.target.getStage();
     if (!stage) return;
     const pointer = stage.getPointerPosition();
     if (!pointer) return;
 
-    const { x, y } = pointer;
+    const x = pointer.x / scale;
+    const y = pointer.y / scale;
 
     if (!isDrawing) {
-      // Start drawing
       setCurrentBox({ x, y, width: 0, height: 0 });
       setIsDrawing(true);
     } else {
-      // Finish drawing
+      console.log("PASTI KESINI!")
       setIsDrawing(false);
       if (currentBox && currentBox.width !== 0 && currentBox.height !== 0) {
         onComplete(currentBox);
@@ -34,14 +39,23 @@ export const useBox = () => {
     }
   };
 
-  const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleCancel = () => {
+    setIsDrawing(false)
+    setCurrentBox(null)
+  }
+
+  const handleMouseMove = (
+    e: Konva.KonvaEventObject<MouseEvent>,
+    scale = 1 // ⬅️ Tambahan scale default
+  ) => {
     if (!isDrawing || !currentBox) return;
     const stage = e.target.getStage();
     if (!stage) return;
     const pointer = stage.getPointerPosition();
     if (!pointer) return;
 
-    const { x, y } = pointer;
+    const x = pointer.x / scale;
+    const y = pointer.y / scale;
 
     setCurrentBox((prev) =>
       prev
@@ -56,7 +70,9 @@ export const useBox = () => {
 
   return {
     currentBox,
+    setCurrentBox,
     handleClick,
     handleMouseMove,
+    handleCancel
   };
 };

@@ -2,9 +2,12 @@ import { UploadIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePdfStore } from "@/store/usePdfStore";
+import { useState } from "react";
+import type { pdfjs } from "react-pdf";
 
 export default function FileUploader() {
   const { file, setFile } = usePdfStore();
+  
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

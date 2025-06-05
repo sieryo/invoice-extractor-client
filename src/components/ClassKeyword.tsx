@@ -11,6 +11,8 @@ import {
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import type { FieldPdfConfig } from "@/models/pdfConfig";
+import { PreviewField } from "./PreviewField";
+import { successMessage } from "@/lib/helper";
 
 export const ClassKeyword = ({
   isEditing,
@@ -45,7 +47,7 @@ export const ClassKeyword = ({
       newConfig.sections.header.fields[index] = updatedField;
       setConfig(newConfig);
     }
-
+    successMessage();
     setIsEditing(false);
   };
 
@@ -94,12 +96,7 @@ export const ClassKeyword = ({
           </div>
         </DialogContent>
       </Dialog>
-      <Input
-        disabled
-        className="mt-2"
-        placeholder={`Example: ${data}`}
-        value={data}
-      />
+      <PreviewField data={field.classified.data.toString()} />
     </div>
   );
 };

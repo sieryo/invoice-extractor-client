@@ -1,92 +1,77 @@
 import { Document, Page, pdfjs } from "react-pdf";
-import { Stage, Layer, Rect } from "react-konva";
 import { useEffect, useState } from "react";
-
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 
 import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-import { useBox, type BoxState } from "@/hooks/useBox";
-import { useActiveFieldStore } from "@/store/useActiveFieldStore";
-import { ClassifiedTypeEnum } from "@/models/pdfConfig";
 import FileUploader from "./FileUploader";
 import { usePdfStore } from "@/store/usePdfStore";
+import { DrawArea } from "./DrawArea";
+import { Button } from "./ui/button";
+import { ZoomIn, ZoomOut } from "lucide-react";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
-// PDFAnnotator terlalu melakukan banyak hal.
-
-// TODO: Desain singkat untuk
-
 export const PDFAnnotator = () => {
-  const {
-    file,
-    config
-  } = usePdfStore()
+  const { file, config, setHeight, setWidth, width, height } = usePdfStore();
 
-  const [boxes, setBoxes] = useState<BoxState[]>([]);
-  const { currentBox, handleMouseMove, handleClick } = useBox();
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [scale, setScale] = useState(1.3);
 
-  const updateBox = (box: BoxState) => {
-    setBoxes([...boxes, box]);
+  const handleLoadSuccess = async (pdf: pdfjs.PDFDocumentProxy) => {
+    setNumPages(pdf.numPages);
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 1 });
+
+    setWidth(viewport.width);
+    setHeight(viewport.height);
+
   };
-
-  useEffect(() => {
-    console.log(file);
-  }, [file]);
-
-  const { field, type } = useActiveFieldStore();
 
   return (
     <div
-      className=" items-center p-4"
+      className="items-center p-4 relative"
       style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
     >
       <FileUploader />
-      {file && (
-        <>
+
+      <div className="flex gap-2 ">
+        <Button onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>
+          <ZoomOut className="w-5 h-5 text-gray-50" />
+        </Button>
+        <Button onClick={() => setScale((s) => s + 0.25)}>
+          <ZoomIn className="w-5 h-5 text-gray-50" />
+        </Button>
+      </div>
+
+      {file && width && height && (
+        <div
+          style={{
+            maxHeight: "calc(100vh - 100px)", 
+            overflow: "auto",
+            maxWidth: "100%",
+            border: "1px solid #ccc",
+          }}
+        >
           <div
-            style={{ position: "relative", width: "600px", height: "800px" }}
+            style={{
+              position: "relative",
+              width: width * scale,
+              height: height * scale,
+            }}
           >
-            <Document file={file}>
-              <Page pageNumber={1} width={600} renderMode="canvas" scale={1} />
+            <Document onLoadSuccess={handleLoadSuccess} file={file}>
+              <Page
+                pageNumber={1}
+                width={width}
+                renderMode="canvas"
+                scale={scale}
+              />
             </Document>
-            <Stage
-              className={`z-50 ${type != ClassifiedTypeEnum.BOX && " pointer-events-none"}`}
-              width={600}
-              height={800}
-              style={{ position: "absolute", top: 0, left: 0 }}
-              onClick={(e) =>
-                handleClick(e, (box) => {
-                  updateBox(box);
-                })
-              }
-              onMouseMove={handleMouseMove}
-            >
-              <Layer>
-                {boxes.map((box, i) => (
-                  // @ts-ignore
-                  <Rect
-                    key={i}
-                    {...box}
-                    strokeWidth={2}
-                    fill={"#15fe0090"}
-                    draggable
-                  />
-                ))}
-                {currentBox && (
-                  <Rect
-                    // @ts-ignore
-                    {...currentBox}
-                    stroke="green"
-                    strokeWidth={2}
-                    fill={"#15fe0030"}
-                  />
-                )}
-              </Layer>
-            </Stage>
+
+            <DrawArea scale={scale} />
           </div>
-        </>
+        </div>
       )}
     </div>
   );

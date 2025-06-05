@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
 import { usePdfStore } from "@/store/usePdfStore";
 import { Input } from "./ui/input";
-
+import { Button } from "./ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,9 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
 import type { FieldPdfConfig } from "@/models/pdfConfig";
+import { PreviewField } from "./PreviewField";
+import { successMessage } from "@/lib/helper";
 
 export const ClassLine = ({
   isEditing,
@@ -23,70 +24,88 @@ export const ClassLine = ({
   isEditing: boolean;
   setIsEditing: (state: boolean) => void;
 }) => {
-  const [lines, setLines] = useState<number[]>([]);
-  const data = field.classified.data as any;
+  const { config, setConfig } = usePdfStore();
+  const [lines, setLines] = useState<number[]>([0, 0]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLines(data);
-  }, [isEditing]);
+    const initialData = Array.isArray(field.classified.data)
+      ? field.classified.data
+      : [0, 0];
+    setLines(initialData);
+    setError(null);
+  }, [isEditing, field.classified.data]);
 
-  const { config, setConfig } = usePdfStore();
+  const handleLineChange = (index: number, value: number) => {
+    const updatedLines = [...lines];
+    updatedLines[index] = value;
+    setLines(updatedLines);
+  };
 
   const handleUpdate = () => {
+    if (lines[1] <= lines[0]) {
+      setError("The final row must be larger than the initial row.");
+      return;
+    }
 
+    const updatedField: FieldPdfConfig = {
+      ...field,
+      classified: {
+        ...field.classified,
+        data: [lines[0] ?? 0, lines[1] ?? 0],
+      },
+    };
+
+    const index = config.sections.header.fields.findIndex(
+      (f) => f.name === field.name
+    );
+    if (index !== -1) {
+      const newConfig = config;
+      newConfig.sections.header.fields[index] = updatedField;
+      setConfig(newConfig);
+    }
+
+    successMessage()
+    setIsEditing(false);
   };
 
   return (
     <div>
-      <Dialog
-        open={isEditing}
-        onOpenChange={() => {
-          setIsEditing(false);
-        }}
-      >
+      <Dialog open={isEditing} onOpenChange={() => setIsEditing(false)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Keyword</DialogTitle>
+            <DialogTitle>Edit Lines</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
-            <div className="mt-2 flex gap-2">
+
+            <div className="mt-4 flex gap-2">
               <Input
                 className="w-full max-w-[150px]"
-                placeholder="Line from. Exc: 0"
-                value={lines[0]}
-                 onChange={(e) => {
-                    const newLine = lines
-                    lines[0] = e.target.value
-                    console.log(lines)
-                    setLines(newLine)
-                }}
+                placeholder="Line from. Ex: 0"
+                type="number"
+                value={lines[0] ?? ""}
+                onChange={(e) => handleLineChange(0, Number(e.target.value))}
               />
               <Input
                 className="w-full max-w-[150px]"
-                placeholder="Line to. Exc: 1"
-                value={lines[1] ?? 0}
+                placeholder="Line to. Ex: 1"
                 type="number"
-                onChange={(e) => {
-                    const newLine = lines
-                    lines[1] = Number(e.target.value)
-                    setLines(newLine)
-                }}
+                value={lines[1] ?? ""}
+                onChange={(e) => handleLineChange(1, Number(e.target.value))}
               />
             </div>
+
+            {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
           </DialogHeader>
 
-          <div className=" pt-4 flex justify-end ">
-            <Button onClick={handleUpdate} className=" bg-green-700 px-8">
+          <div className="pt-4 flex justify-end">
+            <Button onClick={handleUpdate} className="bg-green-700 px-8">
               Save
             </Button>
           </div>
         </DialogContent>
       </Dialog>
-      <Input
-        disabled
-        className="mt-2"
-        placeholder={`Example: ${data}`}
-        value={data}
-      />
+
+      <PreviewField data={field.classified.data.toString()} />
     </div>
   );
 };

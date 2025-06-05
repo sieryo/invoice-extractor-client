@@ -64,10 +64,10 @@ export class PdfConfigManager {
         classified: {
           method: ClassifiedTypeEnum.BOX,
           data: {
-            x0: 326,
-            x1: 525,
-            top: 150,
-            bottom: 186,
+            x0: 360,
+            x1: 530,
+            top: 160,
+            bottom: 184,
           },
         },
       },
