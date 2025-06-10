@@ -1,4 +1,5 @@
 import { useBox, type BoxState } from "@/hooks/useBox";
+import { successMessage } from "@/lib/helper";
 import {
   ClassifiedTypeEnum,
   type Box,
@@ -42,11 +43,7 @@ export const DrawArea = ({ scale }: { scale: number }) => {
       newConfig.sections.header.fields[index] = updatedField;
       setConfig(newConfig);
     }
-    toast.success("Area Updated!", {
-      position: "top-right",
-      richColors: true,
-      
-    })
+   successMessage("Area Updated!")
     setBoxes([currentBox]);
   };
 

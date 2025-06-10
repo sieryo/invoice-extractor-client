@@ -13,6 +13,14 @@ import { Button } from "./ui/button";
 import type { FieldPdfConfig } from "@/models/pdfConfig";
 import { PreviewField } from "./PreviewField";
 import { successMessage } from "@/lib/helper";
+import { Label } from "./ui/label";
+import { Switch } from "./ui/switch";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const ClassKeyword = ({
   isEditing,
@@ -26,7 +34,9 @@ export const ClassKeyword = ({
   setIsEditing: (state: boolean) => void;
 }) => {
   const [value, setValue] = useState("");
+  const [isMultiword, setIsMultiword] = useState(false)
   const data = field.classified.data as any;
+  const multiword = field.classified.isMultiword ?? false
   const { config, setConfig } = usePdfStore();
 
   const handleUpdate = () => {
@@ -36,6 +46,7 @@ export const ClassKeyword = ({
       classified: {
         ...field.classified,
         data: newValue,
+        isMultiword
       },
     };
 
@@ -53,6 +64,7 @@ export const ClassKeyword = ({
 
   useEffect(() => {
     setValue(data);
+    setIsMultiword(multiword)
   }, [isEditing]);
 
   const handleChange = (e: any) => {
@@ -88,6 +100,19 @@ export const ClassKeyword = ({
               onKeyDown={handleKeyDown}
             />
           </DialogHeader>
+          <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="space-y-0.5">
+                  <Label>Multiword</Label>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                Exc. "PT HEBAT"; Singleword Exc. "OST0001"
+              </TooltipContent>
+            </Tooltip>
+            <Switch checked={isMultiword} onCheckedChange={setIsMultiword} />
+          </div>
 
           <div className=" pt-4 flex justify-end ">
             <Button onClick={handleUpdate} className=" bg-green-700 px-8">

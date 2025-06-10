@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePdfStore } from "@/store/usePdfStore";
 import { toast } from "sonner";
+import { successMessage } from "@/lib/helper";
 
 export default function FileUploader() {
   const { file, setFile, setConfig, config } = usePdfStore();
@@ -16,7 +17,7 @@ export default function FileUploader() {
     const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
       newConfig.exportedName = fileNameWithoutExt
       setConfig(newConfig)
-      toast.success("Success Upload file")
+      successMessage("Upload file success")
     } else {
       alert("Mohon upload file PDF");
     }

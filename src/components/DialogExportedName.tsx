@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { Input } from "./ui/input";
 import { toast } from "sonner";
+import { successMessage } from "@/lib/helper";
 
 export const DialogExportedName = ({
   isActive,
@@ -38,7 +39,7 @@ export const DialogExportedName = ({
       newConfig.exportedName = newValue;
 
       setConfig(newConfig);
-      toast.success("Updated!");
+      successMessage("Exported Name updated!")
       setIsActive(false);
     }
   };

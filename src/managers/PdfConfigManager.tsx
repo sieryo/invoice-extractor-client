@@ -77,7 +77,7 @@ export class PdfConfigManager {
         classified: {
           method: ClassifiedTypeEnum.KEYWORD,
           data: "Customer Name",
-          isMultiwords: true,
+          isMultiword: true,
         },
       },
     ];

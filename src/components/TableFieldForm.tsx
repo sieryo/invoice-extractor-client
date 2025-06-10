@@ -81,7 +81,7 @@ export const TableFieldForm = ({ field }: { field: TableField }) => {
               </SelectTrigger>
               <SelectContent >
                 {DEFAULT_TABLE_COLUMN_HEADER.map((col) => (
-                  <SelectItem   value={col.value}>{col.name}</SelectItem>
+                  <SelectItem  key={col.value} value={col.value}>{col.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

@@ -15,7 +15,7 @@ export const TitleLabel = ({ title }: { title: string }) => {
         setIsActive={setIsDialogNameActive}
       />
       <div className=" p-1.5 ">
-        <h1 onDoubleClick={handleDoubleClick} className=" font-bold text-2xl">
+        <h1 onClick={handleDoubleClick} className=" font-bold text-2xl cursor-pointer">
           {title}
         </h1>
       </div>

@@ -20,7 +20,7 @@ export type Box = {
 export type Classified = {
   method: ClassifiedTypeEnum;
   data: [number, number] | string | Box;
-  isMultiwords?: boolean
+  isMultiword?: boolean
 };
 
 export type FieldPdfConfig = {

@@ -20,9 +20,7 @@ export const mapClassifiedTypeEnum = (
   }
 };
 
-export const mapDataTypeFieldEnum = (
-  type: DataTypeEnum
-) => {
+export const mapDataTypeFieldEnum = (type: DataTypeEnum) => {
   switch (type) {
     case DataTypeEnum.STRING:
       return "String";
@@ -31,11 +29,12 @@ export const mapDataTypeFieldEnum = (
     case DataTypeEnum.INT:
       return "Number";
   }
-}
+};
 
-export const successMessage = () => {
-  toast.success("Field Updated!", {
+export const successMessage = (message: string = "Field Updated!") => {
+  toast.success(message, {
     position: "top-right",
     richColors: true,
+    duration: 2000
   });
 };
