@@ -30,7 +30,6 @@ export const useBox = () => {
       setCurrentBox({ x, y, width: 0, height: 0 });
       setIsDrawing(true);
     } else {
-      console.log("PASTI KESINI!")
       setIsDrawing(false);
       if (currentBox && currentBox.width !== 0 && currentBox.height !== 0) {
         onComplete(currentBox);
@@ -40,9 +39,9 @@ export const useBox = () => {
   };
 
   const handleCancel = () => {
-    setIsDrawing(false)
-    setCurrentBox(null)
-  }
+    setIsDrawing(false);
+    setCurrentBox(null);
+  };
 
   const handleMouseMove = (
     e: Konva.KonvaEventObject<MouseEvent>,
@@ -52,20 +51,28 @@ export const useBox = () => {
     const stage = e.target.getStage();
     if (!stage) return;
     const pointer = stage.getPointerPosition();
-    if (!pointer) return;
+    if (!pointer || pointer.x <= 0 || pointer.y <= 0) return;
 
     const x = pointer.x / scale;
     const y = pointer.y / scale;
 
-    setCurrentBox((prev) =>
-      prev
-        ? {
-            ...prev,
-            width: x - prev.x,
-            height: y - prev.y,
-          }
-        : null
-    );
+    setCurrentBox((prev) => {
+      if (!prev) return null;
+
+      const newWidth = x - prev.x;
+      const newHeight = y - prev.y;
+
+      const newX = newWidth < 0 ? x : prev.x;
+      const newY = newHeight < 0 ? y : prev.y;
+
+      return {
+        ...prev,
+        x: newX,
+        y: newY,
+        width: Math.abs(newWidth),
+        height: Math.abs(newHeight),
+      };
+    });
   };
 
   return {
@@ -73,6 +80,6 @@ export const useBox = () => {
     setCurrentBox,
     handleClick,
     handleMouseMove,
-    handleCancel
+    handleCancel,
   };
 };

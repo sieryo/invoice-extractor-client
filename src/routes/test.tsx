@@ -6,6 +6,9 @@ import { Brackets, ScanText, Type } from "lucide-react";
 import { usePdfStore } from "@/store/usePdfStore";
 import { HeaderField } from "@/components/HeaderField";
 import { TableForm } from "@/components/TableForm";
+import { toast } from "sonner";
+import { useActiveFieldBoxStore } from "@/store/useActiveFieldBoxStore";
+import { DrawingModeBanner } from "@/components/DrawingModeBanner";
 
 export const Route = createFileRoute("/test")({
   component: RouteComponent,
@@ -13,9 +16,11 @@ export const Route = createFileRoute("/test")({
 
 function RouteComponent() {
   const { config } = usePdfStore();
+  const field = useActiveFieldBoxStore((state) => state.field);
 
   return (
     <div className="w-full h-screen bg-gray-50 flex">
+      {field && <DrawingModeBanner />}
       {/* PDF Preview Area */}
       <div className="w-1/2 border-r flex flex-col max-w-1/2">
         <PDFAnnotator />
@@ -37,8 +42,7 @@ function RouteComponent() {
               switch (field.classified.method) {
                 case ClassifiedTypeEnum.KEYWORD:
                   icon = <ScanText className="w-5 h-5 text-gray-600" />;
-                  description =
-                    "Enter a keyword that indicates to section : ";
+                  description = "Enter a keyword that indicates to section : ";
                   break;
                 case ClassifiedTypeEnum.BOX:
                   icon = <Brackets className="w-5 h-5 text-gray-600" />;
@@ -65,9 +69,9 @@ function RouteComponent() {
           <TableForm />
         </div>
         <div className="p-4 flex justify-end gap-2">
-          <Button
-          variant={"secondary"}
-          className=" px-8">Data result</Button>
+          <Button variant={"secondary"} className=" px-8">
+            Data result
+          </Button>
           <Button className=" px-8">Export!</Button>
         </div>
       </div>
