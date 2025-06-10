@@ -9,23 +9,40 @@ import { usePdfStore } from "@/store/usePdfStore";
 import { DrawArea } from "./DrawArea";
 import { Button } from "./ui/button";
 import { ZoomIn, ZoomOut } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import { DialogExportedName } from "./DialogExportedName";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 export const PDFAnnotator = () => {
-  const { file, config, setHeight, setWidth, width, height } = usePdfStore();
+  const { file, setHeight, setWidth, width, height } = usePdfStore();
 
   const [numPages, setNumPages] = useState<number | null>(null);
   const [scale, setScale] = useState(1.3);
 
+  const [isDialogNameActive, setIsDialogNameActive] = useState(false);
+
   const handleLoadSuccess = async (pdf: pdfjs.PDFDocumentProxy) => {
-    setNumPages(pdf.numPages);
-    const page = await pdf.getPage(1);
-    const viewport = page.getViewport({ scale: 1 });
+    try {
+      setNumPages(pdf.numPages);
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 1 });
 
-    setWidth(viewport.width);
-    setHeight(viewport.height);
+      setWidth(viewport.width);
+      setHeight(viewport.height);
 
+      setIsDialogNameActive(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      //
+    }
   };
 
   return (
@@ -35,6 +52,13 @@ export const PDFAnnotator = () => {
     >
       <FileUploader />
 
+
+      <DialogExportedName 
+      isActive={isDialogNameActive}
+      setIsActive={setIsDialogNameActive}
+      />
+
+      
       <div className="flex gap-2 ">
         <Button onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>
           <ZoomOut className="w-5 h-5 text-gray-50" />
@@ -47,7 +71,7 @@ export const PDFAnnotator = () => {
       {file && width && height && (
         <div
           style={{
-            maxHeight: "calc(100vh - 100px)", 
+            maxHeight: "calc(100vh - 100px)",
             overflow: "auto",
             maxWidth: "100%",
             border: "1px solid #ccc",

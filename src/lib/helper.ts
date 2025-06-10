@@ -1,4 +1,4 @@
-import { ClassifiedTypeEnum } from "@/models/pdfConfig";
+import { ClassifiedTypeEnum, DataTypeEnum } from "@/models/pdfConfig";
 import { toast } from "sonner";
 
 export const tagStringToArray = (tagString: string | undefined): string[] =>
@@ -19,6 +19,19 @@ export const mapClassifiedTypeEnum = (
       return "Box Area";
   }
 };
+
+export const mapDataTypeFieldEnum = (
+  type: DataTypeEnum
+) => {
+  switch (type) {
+    case DataTypeEnum.STRING:
+      return "String";
+    case DataTypeEnum.FLOAT:
+      return "Decimal";
+    case DataTypeEnum.INT:
+      return "Number";
+  }
+}
 
 export const successMessage = () => {
   toast.success("Field Updated!", {

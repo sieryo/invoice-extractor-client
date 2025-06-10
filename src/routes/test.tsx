@@ -5,10 +5,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Brackets, ScanText, Type } from "lucide-react";
 import { usePdfStore } from "@/store/usePdfStore";
 import { HeaderField } from "@/components/HeaderField";
-import { TableForm } from "@/components/TableForm";
-import { toast } from "sonner";
 import { useActiveFieldBoxStore } from "@/store/useActiveFieldBoxStore";
 import { DrawingModeBanner } from "@/components/DrawingModeBanner";
+import { TableFieldForm } from "@/components/TableFieldForm";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { TitleLabel } from "@/components/TitleLabel";
 
 export const Route = createFileRoute("/test")({
   component: RouteComponent,
@@ -28,9 +30,9 @@ function RouteComponent() {
 
       {/* Sidebar Panel */}
       <div className="w-1/2 bg-gray-50 flex flex-col h-full z-50">
-        <div className=" p-1.5 ">
-          <h1 className=" font-bold text-2xl">TRANSAKSI 02 MEI 2025</h1>
-        </div>
+        <TitleLabel 
+        title={config.exportedName ? config.exportedName : "Title Here"}
+        />
         <div className="flex-grow overflow-auto p-4 pb-10">
           <div className=" p-2 ">
             <h2 className=" font-semibold text-xl">Header</h2>
@@ -66,13 +68,37 @@ function RouteComponent() {
               );
             })}
           </div>
-          <TableForm />
+          <div>
+            <div className=" p-2 ">
+              <h2 className=" font-semibold text-xl">Products / Table</h2>
+            </div>
+            <div>
+              <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm mb-3">
+                <div className="space-y-0.5">
+                  <Label>Has column "No"</Label>
+                </div>
+                <Switch checked={true} />
+              </div>
+            </div>
+            <div className=" flex flex-col gap-6">
+              {config.sections.table.tableHeader.map((field) => {
+                return (
+                  <TableFieldForm
+                    key={field.name}
+                    field={field}
+                  />
+                );
+              })}
+            </div>
+          </div>
         </div>
         <div className="p-4 flex justify-end gap-2">
           <Button variant={"secondary"} className=" px-8">
             Data result
           </Button>
-          <Button className=" px-8">Export!</Button>
+          <Button onClick={() => {
+            console.log(config)
+          }} className=" px-8">Export!</Button>
         </div>
       </div>
     </div>

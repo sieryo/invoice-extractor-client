@@ -34,6 +34,7 @@ export type HeaderPdfConfig = {
 };
 
 export type TableField = {
+  columnName: string;
   name: string;
   type: DataTypeEnum;
 };
