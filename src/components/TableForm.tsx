@@ -7,53 +7,48 @@ import { usePdfStore } from "@/store/usePdfStore";
 import { DataTypeEnum, type TableField } from "@/models/pdfConfig";
 import { Switch } from "./ui/switch";
 
-
-export const TableForm = ({
-
-} : {
-
-}) => {
-  const { config } = usePdfStore();
+export const TableForm = ({}: {}) => {
+  const { config, setConfig } = usePdfStore();
   const tableConfig = config.sections.table;
   const [isHasColumnIndex, setIsHasColumnIndex] = useState(false);
-  const [columnFields, setColumnFields] = useState<
-    { id: string; name: string; type: DataTypeEnum }[]
-  >([]);
+  const targetField: TableField = {
+    name: "no",
+    type: DataTypeEnum.INT,
+    columnName: "No",
+  };
 
   useEffect(() => {
-    const column = tableConfig.tableHeader.map((header) => {
-      return {
-        ...header,
-        id: nanoid(),
-      };
-    });
-    setColumnFields(column);
-  }, []);
+    const exists = tableConfig.tableHeader.some(
+      (field) => field.name === targetField.name
+    );
 
-  const [newColumn, setNewColumn] = useState<string>("");
+    console.log(exists)
 
-  const handleChange = (id: string, newValue: string) => {
-    if (newValue.trim() !== "") {
-      setColumnFields((prev) =>
-        prev.map((f) => (f.id === id ? { ...f, value: newValue } : f))
+    setIsHasColumnIndex(exists)
+  }, [config]);
+
+  const handleChecked = (checked: boolean) => {
+    const exists = tableConfig.tableHeader.some(
+      (field) => field.name === targetField.name
+    );
+
+    let newTableHeader;
+
+    if (checked && !exists) {
+      newTableHeader = [targetField, ...tableConfig.tableHeader];
+    } else if (!checked && exists) {
+      newTableHeader = tableConfig.tableHeader.filter(
+        (field) => field.name !== targetField.name
       );
     } else {
-      handleDelete(id);
+      newTableHeader = tableConfig.tableHeader;
     }
-  };
 
-  const handleDelete = (id: string) => {
-    setColumnFields((prev) => prev.filter((f) => f.id !== id));
-  };
+    const newConfig = config;
+    config.sections.table.tableHeader = newTableHeader;
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && newColumn.trim() !== "") {
-      setColumnFields((prev) => [
-        ...prev,
-        { id: nanoid(), name: newColumn.trim(), type: DataTypeEnum.STRING },
-      ]);
-      setNewColumn("");
-    }
+    setIsHasColumnIndex(checked)
+    setConfig(newConfig);
   };
 
   return (
@@ -61,13 +56,13 @@ export const TableForm = ({
       <div className=" p-2">
         <h2 className=" font-semibold text-xl">Products / Table</h2>
         <div>
-          <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+          <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm my-1.5">
             <div className="space-y-0.5">
               <Label>Has column "No"</Label>
             </div>
             <Switch
               checked={isHasColumnIndex}
-              onCheckedChange={setIsHasColumnIndex}
+              onCheckedChange={handleChecked}
             />
           </div>
         </div>

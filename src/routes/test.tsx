@@ -12,7 +12,10 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { TitleLabel } from "@/components/TitleLabel";
 
+import axios from "axios";
+
 import { useEffect } from "react";
+import { TableForm } from "@/components/TableForm";
 
 export const Route = createFileRoute("/test")({
   component: RouteComponent,
@@ -22,18 +25,90 @@ function RouteComponent() {
   const { file, config } = usePdfStore();
   const field = useActiveFieldBoxStore((state) => state.field);
 
-  useEffect(() => {
-    const handleBeforeUnload = (e : any) => {
-      if (!file) return;
-      e.preventDefault();
-      e.returnValue = "";
+  // useEffect(() => {
+  //   const handleBeforeUnload = (e: any) => {
+  //     if (!file) return;
+  //     e.preventDefault();
+  //     e.returnValue = "";
+  //   };
+
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, [file]);
+
+  const handleExport = async () => {
+    const newHeaderFields = config.sections.header.fields.map((field) => ({
+      name: field.name,
+      classified: {
+        method: field.classified.method,
+        data: field.classified.data,
+        is_multiword: field.classified.isMultiword ?? false,
+      },
+    }));
+
+    const newTableHeader = config.sections.table.tableHeader.map((h) => ({
+      name: h.name,
+      type: h.type,
+    }));
+
+    const newTableConfig = {
+      table_header: newTableHeader,
+      extract_fields: config.sections.table.extractFields,
     };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+    const newHeaderConfig = {
+      fields: newHeaderFields,
     };
-  }, [file]);
+
+    const newSections = {
+      header: newHeaderConfig,
+      table: newTableConfig,
+    };
+
+    const newConfig = {
+      exported_name: config.exportedName,
+      sections: newSections,
+    };
+
+    console.log(newConfig);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("config_str", JSON.stringify(newConfig));
+
+    try {
+      const response = await axios.post(
+        "http://192.168.56.1:8000/export",
+        formData,
+        {
+          responseType: "blob",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const contentDisposition = response.headers["content-disposition"];
+      console.log(contentDisposition)
+      let filename = `${config.exportedName}.xlsx`;
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+)"?/);
+        if (match) filename = match[1];
+      }
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("Upload error:", err);
+    }
+  };
 
   return (
     <div className="w-full h-screen bg-gray-50 flex">
@@ -86,17 +161,7 @@ function RouteComponent() {
               })}
             </div>
             <div>
-              <div className=" p-2 ">
-                <h2 className=" font-semibold text-xl">Products / Table</h2>
-              </div>
-              <div>
-                <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm mb-3">
-                  <div className="space-y-0.5">
-                    <Label>Has column "No"</Label>
-                  </div>
-                  <Switch checked={true} />
-                </div>
-              </div>
+              <TableForm />
               <div className=" flex flex-col gap-6">
                 {config.sections.table.tableHeader.map((field) => {
                   return <TableFieldForm key={field.name} field={field} />;
@@ -108,13 +173,7 @@ function RouteComponent() {
             <Button variant={"secondary"} className=" px-8">
               Data result
             </Button>
-            <Button
-              onClick={() => {
-                console.log(file);
-                console.log(config);
-              }}
-              className=" px-8"
-            >
+            <Button onClick={handleExport} className=" px-8">
               Export!
             </Button>
           </div>

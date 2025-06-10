@@ -2,7 +2,6 @@ import { UploadIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePdfStore } from "@/store/usePdfStore";
-import { toast } from "sonner";
 import { successMessage } from "@/lib/helper";
 
 export default function FileUploader() {
@@ -12,7 +11,7 @@ export default function FileUploader() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type === "application/pdf") {
-      setFile(URL.createObjectURL(file));
+      setFile(file)
       const newConfig = config
     const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
       newConfig.exportedName = fileNameWithoutExt

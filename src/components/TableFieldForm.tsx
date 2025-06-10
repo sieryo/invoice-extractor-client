@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { DEFAULT_TABLE_COLUMN_HEADER } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 export const TableFieldForm = ({ field }: { field: TableField }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -27,8 +28,9 @@ export const TableFieldForm = ({ field }: { field: TableField }) => {
   return (
     <div className="relative flex gap-3 items-start p-1.5 pb-5 border-b border-b-gray-200">
       <button
-        className="absolute top-1.5 right-1.5 text-gray-700 hover:text-blue-500"
+        className={cn(`absolute top-1.5 right-1.5 text-gray-700 hover:text-blue-500`, field.name == "no" && "text-gray-400")}
         title="Edit"
+        disabled={field.name == "no"}
         onClick={() => {
           handleIsEditing(true);
         }}

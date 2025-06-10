@@ -1,13 +1,13 @@
 export enum ClassifiedTypeEnum {
-  KEYWORD,
-  BOX,
-  LINE,
+  KEYWORD = "keyword",
+  BOX = "box",
+  LINE = "line",
 }
 
 export enum DataTypeEnum {
-  FLOAT,
-  INT,
-  STRING,
+  FLOAT = "float",
+  INT = "int",
+  STRING = "string",
 }
 
 export type Box = {
@@ -20,7 +20,7 @@ export type Box = {
 export type Classified = {
   method: ClassifiedTypeEnum;
   data: [number, number] | string | Box;
-  isMultiword?: boolean
+  isMultiword?: boolean;
 };
 
 export type FieldPdfConfig = {
