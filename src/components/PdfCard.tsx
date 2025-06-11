@@ -14,15 +14,7 @@ export const PdfCard = ({
   isActive: boolean;
 }) => {
   return (
-    <div
-      style={{
-        width: width,
-      }}
-      className="h-full relative"
-    >
-      <div className=" absolute top-[-25px]">
-        <p className={cn(" text-sm text-gray-600", isActive && "text-gray-900" )}>{pdf.config.fileName}</p>
-      </div>
+    <div>
       {pdf.file && width && height && (
         <div
           style={{

@@ -57,13 +57,15 @@ export const PDFAnnotator = () => {
         isActive={isDialogNameActive}
         setIsActive={setIsDialogNameActive}
       />
-
-      <div className="flex gap-2 absolute z-50 mt-4  w-full ">
+      <div className=" absolute left-0 top-[8px]">
         <div className=" max-w-10 pl-2">
           <Button onClick={() => setIsSheetOpen(true)}>
             <AlignJustify className="w-5 h-5 text-gray-50" />
           </Button>
         </div>
+      </div>
+      <div className="flex gap-2   bg-gray-100 p-1.5 items-center   w-full ">
+        
         <div className=" w-full justify-center gap-3 flex ">
           <Button onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>
             <ZoomOut className="w-5 h-5 text-gray-50" />
