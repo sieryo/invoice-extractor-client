@@ -1,39 +1,62 @@
-// GLOBAL CONFIG PDF STATE
-
-import { DEFAULT_PDF_VIEWER_HEIGHT, DEFAULT_PDF_VIEWER_WIDTH } from "@/lib/constants";
-import { PdfConfigManager } from "@/managers/PdfConfigManager";
-import type { PdfConfig } from "@/models/pdfConfig";
 import { create } from "zustand";
+import { v4 as uuidv4 } from "uuid";
+import {
+  DEFAULT_PDF_VIEWER_WIDTH,
+  DEFAULT_PDF_VIEWER_HEIGHT,
+} from "@/lib/constants";
+import type { PdfConfig } from "@/models/pdfConfig";
 
-// Sementara upload 1 file dulu
-type PdfStore = {
+type PdfItem = {
+  id: string;
   file: any;
-  setFile: (file: any) => void;
+  config: PdfConfig;
+};
+
+type PdfStore = {
+  pdfs: PdfItem[];
+  addPdf: (file: any, config: PdfConfig) => void;
+  removePdf: (id: string) => void;
+  currentId: string | null;
+  setCurrentId: (id: string) => void;
+  currentPdf: () => PdfItem | undefined;
+  updateConfig: (id: string, newConfig: PdfConfig) => void;
   width: number;
   setWidth: (width: number) => void;
   height: number;
   setHeight: (height: number) => void;
-  config: PdfConfig;
-  setConfig: (config: PdfConfig) => void;
 };
 
-export const usePdfStore = create<PdfStore>()((set) => ({
-  file: null,
-  setFile: (file) => {
-    console.log(file);
-    return set(() => ({ file }));
+export const usePdfStore = create<PdfStore>((set, get) => ({
+  pdfs: [],
+  addPdf: (file, config) => {
+    const id = uuidv4();
+    set((state) => ({
+      pdfs: [...state.pdfs, { id, file, config }],
+      currentId: id, // langsung aktifkan
+    }));
   },
+  removePdf: (id) => {
+    set((state) => ({
+      pdfs: state.pdfs.filter((p) => p.id !== id),
+      currentId: state.currentId === id ? null : state.currentId,
+    }));
+  },
+  currentId: null,
+  setCurrentId: (id) => set(() => ({ currentId: id })),
+  currentPdf: () => {
+    const { pdfs, currentId } = get();
+    return pdfs.find((p) => p.id === currentId);
+  },
+  updateConfig: (id, newConfig) => {
+    set((state) => ({
+      pdfs: state.pdfs.map((pdf) =>
+        pdf.id === id ? { ...pdf, config: newConfig } : pdf
+      ),
+    }));
+  },
+
   width: DEFAULT_PDF_VIEWER_WIDTH,
-  setWidth: (width) => {
-    return set(() => ({ width }));
-  },
+  setWidth: (width) => set(() => ({ width })),
   height: DEFAULT_PDF_VIEWER_HEIGHT,
-  setHeight: (height) => {
-    return set(() => ({ height }));
-  },
-  config: PdfConfigManager.generate(),
-  setConfig: (config) => {
-    console.log(config);
-    return set(() => ({ config }));
-  },
+  setHeight: (height) => set(() => ({ height })),
 }));

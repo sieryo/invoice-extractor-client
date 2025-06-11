@@ -1,4 +1,3 @@
-import { usePdfStore } from "@/store/usePdfStore";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -9,8 +8,8 @@ import {
 } from "./ui/dialog";
 import { useState } from "react";
 import { Input } from "./ui/input";
-import { toast } from "sonner";
 import { successMessage } from "@/lib/helper";
+import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 
 export const DialogExportedName = ({
   isActive,
@@ -19,8 +18,10 @@ export const DialogExportedName = ({
   isActive: boolean;
   setIsActive: (val: boolean) => void;
 }) => {
-  const { config, setConfig } = usePdfStore();
+  const { config, updateConfig, id } = useCurrentPdf();
   const [value, setValue] = useState("");
+
+  if (!config || !id) return null;
 
   const handleChange = (e: any) => {
     const value = e.target.value;
@@ -38,8 +39,8 @@ export const DialogExportedName = ({
       const newConfig = config;
       newConfig.exportedName = newValue;
 
-      setConfig(newConfig);
-      successMessage("Exported Name updated!")
+      updateConfig(id, newConfig);
+      successMessage("Exported Name updated!");
       setIsActive(false);
     }
   };

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { ClassifiedTypeEnum } from "@/models/pdfConfig";
 import { createFileRoute } from "@tanstack/react-router";
 import { Brackets, ScanText, Type } from "lucide-react";
-import { usePdfStore } from "@/store/usePdfStore";
 import { HeaderField } from "@/components/HeaderField";
 import { useActiveFieldBoxStore } from "@/store/useActiveFieldBoxStore";
 import { DrawingModeBanner } from "@/components/DrawingModeBanner";
@@ -16,13 +15,14 @@ import { TableForm } from "@/components/TableForm";
 import { failedMessage } from "@/lib/helper";
 import { FullscreenLoader } from "@/components/FullScreenLoader";
 import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
+import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 
-export const Route = createFileRoute("/test")({
+export const Route = createFileRoute("/view")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { file, config } = usePdfStore();
+  const { pdf, config, file } = useCurrentPdf();
   const field = useActiveFieldBoxStore((state) => state.field);
   const { isLoading, setIsLoading } = useFullScreenLoadingStore();
   // useEffect(() => {
@@ -37,6 +37,8 @@ function RouteComponent() {
   //     window.removeEventListener("beforeunload", handleBeforeUnload);
   //   };
   // }, [file]);
+
+  if (!pdf || !config || !file) return null;
 
   const handleExport = async () => {
     setIsLoading(true);
@@ -140,7 +142,6 @@ function RouteComponent() {
       <div className="w-1/2 border-r flex flex-col max-w-1/2 ">
         <PDFAnnotator />
       </div>
-      
 
       {/* Sidebar Panel */}
       {file ? (

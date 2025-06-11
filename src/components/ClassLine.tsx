@@ -12,6 +12,7 @@ import {
 import type { FieldPdfConfig } from "@/models/pdfConfig";
 import { PreviewField } from "./PreviewField";
 import { successMessage } from "@/lib/helper";
+import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 
 export const ClassLine = ({
   isEditing,
@@ -24,9 +25,9 @@ export const ClassLine = ({
   isEditing: boolean;
   setIsEditing: (state: boolean) => void;
 }) => {
-  const { config, setConfig } = usePdfStore();
   const [lines, setLines] = useState<number[]>([0, 0]);
   const [error, setError] = useState<string | null>(null);
+  const { config, file, id, updateConfig } = useCurrentPdf();
 
   useEffect(() => {
     const initialData = Array.isArray(field.classified.data)
@@ -41,6 +42,8 @@ export const ClassLine = ({
     updatedLines[index] = value;
     setLines(updatedLines);
   };
+
+  if (!config || !file || !id) return null;
 
   const handleUpdate = () => {
     if (lines[1] <= lines[0]) {
@@ -62,14 +65,14 @@ export const ClassLine = ({
     if (index !== -1) {
       const newConfig = config;
       newConfig.sections.header.fields[index] = updatedField;
-      setConfig(newConfig);
+      updateConfig(id, newConfig);
     }
 
-    successMessage()
+    successMessage();
     setIsEditing(false);
   };
   // @ts-expect-error
-  const previewData = `Line ${field.classified.data[0] ?? "1"} to line ${field.classified.data[1] ?? "1"} `
+  const previewData = `Line ${field.classified.data[0] ?? "1"} to line ${field.classified.data[1] ?? "1"} `;
 
   return (
     <div>

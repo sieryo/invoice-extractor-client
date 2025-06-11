@@ -12,19 +12,15 @@ import { SheetIcon, ZoomIn, ZoomOut } from "lucide-react";
 
 import { DialogExportedName } from "./DialogExportedName";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { PdfCard } from "./PdfCard";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 export const PDFAnnotator = () => {
-  const { file, setHeight, setWidth, width, height } = usePdfStore();
+  const { currentPdf, width, height, setHeight, setWidth } = usePdfStore();
+
+  const curPdf = currentPdf();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -50,13 +46,14 @@ export const PDFAnnotator = () => {
     }
   };
 
+  if (!curPdf) return null;
+
   return (
     <div
       className="items-center  relative"
       style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
     >
-      <FileUploader />
-      <Sheet  open={isOpen} onOpenChange={setIsOpen}>
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className=" p-2 h-[300px] overflow-auto" side="top">
           <PdfCard />
         </SheetContent>
@@ -79,7 +76,7 @@ export const PDFAnnotator = () => {
         </Button>
       </div>
 
-      {file && width && height && (
+      {curPdf.file && width && height && (
         <div
           style={{
             maxHeight: "calc(100vh)",
@@ -95,7 +92,7 @@ export const PDFAnnotator = () => {
               height: height * scale,
             }}
           >
-            <Document onLoadSuccess={handleLoadSuccess} file={file}>
+            <Document onLoadSuccess={handleLoadSuccess} file={curPdf.file}>
               <Page
                 pageNumber={1}
                 width={width}

@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
 import { Label } from "./ui/label";
-import { nanoid } from "nanoid";
-import { TagEdit } from "./input/TagEdit";
-import { Input } from "./ui/input";
-import { usePdfStore } from "@/store/usePdfStore";
 import { DataTypeEnum, type TableField } from "@/models/pdfConfig";
 import { Switch } from "./ui/switch";
+import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 
 export const TableForm = ({}: {}) => {
-  const { config, setConfig } = usePdfStore();
-  const tableConfig = config.sections.table;
+  const { config, updateConfig, id } = useCurrentPdf();
   const [isHasColumnIndex, setIsHasColumnIndex] = useState(false);
   const targetField: TableField = {
     name: "no",
@@ -22,10 +18,13 @@ export const TableForm = ({}: {}) => {
       (field) => field.name === targetField.name
     );
 
-    console.log(exists)
+    console.log(exists);
 
-    setIsHasColumnIndex(exists)
+    setIsHasColumnIndex(exists);
   }, [config]);
+
+  if (!config || !id) return null;
+  const tableConfig = config.sections.table;
 
   const handleChecked = (checked: boolean) => {
     const exists = tableConfig.tableHeader.some(
@@ -47,8 +46,8 @@ export const TableForm = ({}: {}) => {
     const newConfig = config;
     config.sections.table.tableHeader = newTableHeader;
 
-    setIsHasColumnIndex(checked)
-    setConfig(newConfig);
+    setIsHasColumnIndex(checked);
+    updateConfig(id, newConfig);
   };
 
   return (

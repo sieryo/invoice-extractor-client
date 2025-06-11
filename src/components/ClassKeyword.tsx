@@ -21,6 +21,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 
 export const ClassKeyword = ({
   isEditing,
@@ -34,10 +35,12 @@ export const ClassKeyword = ({
   setIsEditing: (state: boolean) => void;
 }) => {
   const [value, setValue] = useState("");
-  const [isMultiword, setIsMultiword] = useState(false)
+  const [isMultiword, setIsMultiword] = useState(false);
   const data = field.classified.data as any;
-  const multiword = field.classified.isMultiword ?? false
-  const { config, setConfig } = usePdfStore();
+  const multiword = field.classified.isMultiword ?? false;
+  const { config, file, id, updateConfig } = useCurrentPdf();
+
+  if (!config || !file || !id) return null;
 
   const handleUpdate = () => {
     const newValue = value.trim() !== "" ? value : data;
@@ -46,7 +49,7 @@ export const ClassKeyword = ({
       classified: {
         ...field.classified,
         data: newValue,
-        isMultiword
+        isMultiword,
       },
     };
 
@@ -56,7 +59,7 @@ export const ClassKeyword = ({
     if (index !== -1) {
       const newConfig = config;
       newConfig.sections.header.fields[index] = updatedField;
-      setConfig(newConfig);
+      updateConfig(id, newConfig);
     }
     successMessage();
     setIsEditing(false);
@@ -64,7 +67,7 @@ export const ClassKeyword = ({
 
   useEffect(() => {
     setValue(data);
-    setIsMultiword(multiword)
+    setIsMultiword(multiword);
   }, [isEditing]);
 
   const handleChange = (e: any) => {
@@ -121,7 +124,10 @@ export const ClassKeyword = ({
           </div>
         </DialogContent>
       </Dialog>
-      <PreviewField data={field.classified.data.toString()} isMultiword={field.classified.isMultiword} />
+      <PreviewField
+        data={field.classified.data.toString()}
+        isMultiword={field.classified.isMultiword}
+      />
     </div>
   );
 };

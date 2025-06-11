@@ -1,7 +1,9 @@
-import { usePdfStore } from "@/store/usePdfStore";
+import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 
 export const FormFormat = () => {
-  const { config } = usePdfStore();
+  const { config } = useCurrentPdf();
+
+  if (!config) return null;
   return (
     <div className=" w-full h-full">
       <div className=" flex gap-1 flex-row">

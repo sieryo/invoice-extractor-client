@@ -1,30 +1,14 @@
 import { UploadIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { usePdfStore } from "@/store/usePdfStore";
-import { successMessage } from "@/lib/helper";
+import { BaseFileUploader } from "./BaseFileUploader";
+import { useRouter } from "@tanstack/react-router";
 
 export default function FileUploader() {
-  const { file, setFile, setConfig, config } = usePdfStore();
-  
+  const router = useRouter();
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type === "application/pdf") {
-      setFile(file)
-      const newConfig = config
-    const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-      newConfig.exportedName = fileNameWithoutExt
-      setConfig(newConfig)
-      successMessage("Upload file success")
-    } else {
-      alert("Mohon upload file PDF");
-    }
+  const handleSuccessUpload = () => {
+    return router.navigate({ to: "/view" });
   };
-
-  if (file) {
-    return null;
-  }
 
   return (
     <div className="w-full max-w-md mx-auto p-4">
@@ -39,14 +23,7 @@ export default function FileUploader() {
             or click to upload
           </p>
         </div>
-        <Input
-          id="files"
-          type="file"
-          accept="application/pdf"
-          multiple
-          className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-          onChange={handleFileUpload}
-        />
+        <BaseFileUploader onSuccessUpload={handleSuccessUpload} />
       </div>
     </div>
   );

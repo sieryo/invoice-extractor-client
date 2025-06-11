@@ -12,6 +12,7 @@ export class PdfConfigManager {
   constructor(exportedName: string) {
     this.config = {
       exportedName,
+      fileName: exportedName,
       sections: {
         header: {
           fields: [],
@@ -24,7 +25,7 @@ export class PdfConfigManager {
     };
   }
 
-  static generate(): PdfConfig {
+  static generate(fileName: string): PdfConfig {
     const fields: FieldPdfConfig[] = [
       {
         name: "invoice_number",
@@ -83,15 +84,16 @@ export class PdfConfigManager {
     ];
 
     const tableFields: TableField[] = [
-      {columnName: "SKU", name: "sku", type: DataTypeEnum.STRING },
-      {columnName: "Product Name", name: "name", type: DataTypeEnum.STRING },
-      {columnName: "Quantity", name: "quantity", type: DataTypeEnum.INT },
-      {columnName: "Price", name: "price", type: DataTypeEnum.FLOAT },
-      {columnName: "Amount", name: "total", type: DataTypeEnum.FLOAT },
+      { columnName: "SKU", name: "sku", type: DataTypeEnum.STRING },
+      { columnName: "Product Name", name: "name", type: DataTypeEnum.STRING },
+      { columnName: "Quantity", name: "quantity", type: DataTypeEnum.INT },
+      { columnName: "Price", name: "price", type: DataTypeEnum.FLOAT },
+      { columnName: "Amount", name: "total", type: DataTypeEnum.FLOAT },
     ];
 
     const config: PdfConfig = {
-      exportedName: "",
+      exportedName: fileName,
+      fileName: fileName,
       sections: {
         header: {
           fields,
@@ -105,5 +107,4 @@ export class PdfConfigManager {
 
     return config;
   }
-
 }
