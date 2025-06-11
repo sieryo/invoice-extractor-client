@@ -68,6 +68,8 @@ export const ClassLine = ({
     successMessage()
     setIsEditing(false);
   };
+  // @ts-expect-error
+  const previewData = `Line ${field.classified.data[0] ?? "1"} to line ${field.classified.data[1] ?? "1"} `
 
   return (
     <div>
@@ -80,15 +82,17 @@ export const ClassLine = ({
             <div className="mt-4 flex gap-2">
               <Input
                 className="w-full max-w-[150px]"
-                placeholder="Line from. Ex: 0"
+                placeholder="Line from. Ex: 1"
                 type="number"
+                min={1}
                 value={lines[0] ?? ""}
                 onChange={(e) => handleLineChange(0, Number(e.target.value))}
               />
               <Input
                 className="w-full max-w-[150px]"
-                placeholder="Line to. Ex: 1"
+                placeholder="Line to. Ex: 2"
                 type="number"
+                min={1}
                 value={lines[1] ?? ""}
                 onChange={(e) => handleLineChange(1, Number(e.target.value))}
               />
@@ -105,7 +109,7 @@ export const ClassLine = ({
         </DialogContent>
       </Dialog>
 
-      <PreviewField data={field.classified.data.toString()} />
+      <PreviewField label="Configured lines" data={previewData} />
     </div>
   );
 };

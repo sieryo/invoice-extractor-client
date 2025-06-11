@@ -38,3 +38,11 @@ export const successMessage = (message: string = "Field Updated!") => {
     duration: 2000
   });
 };
+
+export const failedMessage = (message: string = "Failed") => {
+  toast.error(message, {
+    position: "top-right",
+    richColors: true,
+  });
+};
+

@@ -47,7 +47,7 @@ export class PdfConfigManager {
         label: "Seller Address",
         classified: {
           method: ClassifiedTypeEnum.LINE,
-          data: [1, 2],
+          data: [2, 3],
         },
       },
       {
@@ -55,7 +55,7 @@ export class PdfConfigManager {
         label: "Seller Name",
         classified: {
           method: ClassifiedTypeEnum.LINE,
-          data: [0, 0],
+          data: [1, 1],
         },
       },
       {

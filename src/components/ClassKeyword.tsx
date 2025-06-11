@@ -121,7 +121,7 @@ export const ClassKeyword = ({
           </div>
         </DialogContent>
       </Dialog>
-      <PreviewField data={field.classified.data.toString()} />
+      <PreviewField data={field.classified.data.toString()} isMultiword={field.classified.isMultiword} />
     </div>
   );
 };

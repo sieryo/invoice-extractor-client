@@ -8,14 +8,14 @@ import { HeaderField } from "@/components/HeaderField";
 import { useActiveFieldBoxStore } from "@/store/useActiveFieldBoxStore";
 import { DrawingModeBanner } from "@/components/DrawingModeBanner";
 import { TableFieldForm } from "@/components/TableFieldForm";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { TitleLabel } from "@/components/TitleLabel";
 
 import axios from "axios";
 
-import { useEffect } from "react";
 import { TableForm } from "@/components/TableForm";
+import { failedMessage } from "@/lib/helper";
+import { FullscreenLoader } from "@/components/FullScreenLoader";
+import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
 
 export const Route = createFileRoute("/test")({
   component: RouteComponent,
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/test")({
 function RouteComponent() {
   const { file, config } = usePdfStore();
   const field = useActiveFieldBoxStore((state) => state.field);
-
+  const { isLoading, setIsLoading } = useFullScreenLoadingStore();
   // useEffect(() => {
   //   const handleBeforeUnload = (e: any) => {
   //     if (!file) return;
@@ -39,6 +39,8 @@ function RouteComponent() {
   // }, [file]);
 
   const handleExport = async () => {
+    setIsLoading(true);
+
     const newHeaderFields = config.sections.header.fields.map((field) => ({
       name: field.name,
       classified: {
@@ -80,7 +82,7 @@ function RouteComponent() {
 
     try {
       const response = await axios.post(
-        "http://192.168.56.1:8000/export",
+        `${import.meta.env.VITE_API_BASE}/export`,
         formData,
         {
           responseType: "blob",
@@ -92,7 +94,6 @@ function RouteComponent() {
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const contentDisposition = response.headers["content-disposition"];
-      console.log(contentDisposition)
       let filename = `${config.exportedName}.xlsx`;
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="?(.+)"?/);
@@ -105,15 +106,37 @@ function RouteComponent() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Upload error:", err);
+      if (
+        err.response &&
+        err.response.data instanceof Blob &&
+        err.response.data.type === "application/json"
+      ) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          const errorText = reader.result;
+          try {
+            // @ts-expect-error
+            const json = JSON.parse(errorText ?? "");
+            failedMessage(json.detail || "Unknown Error");
+          } catch (parseError) {
+            failedMessage("Error:" + errorText);
+          }
+        };
+        reader.readAsText(err.response.data);
+      } else {
+        alert("err: " + (err.message || "Terjadi kesalahan"));
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="w-full h-screen bg-gray-50 flex">
+      {isLoading && <FullscreenLoader />}
       {field && <DrawingModeBanner />}
-      {/* PDF Preview Area */}
       <div className="w-1/2 border-r flex flex-col max-w-1/2">
         <PDFAnnotator />
       </div>
