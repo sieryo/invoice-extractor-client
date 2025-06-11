@@ -86,7 +86,7 @@ export const DrawArea = ({ scale }: { scale: number }) => {
 
   return (
     <Stage
-      className={`${isDrawingMode ? "z-50" : ""}`}
+      className={`${isDrawingMode ? "z-40" : ""}`}
       width={600 * scale}
       height={800 * scale}
       scaleX={scale}

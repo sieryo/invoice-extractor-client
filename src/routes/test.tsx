@@ -137,9 +137,10 @@ function RouteComponent() {
     <div className="w-full h-screen bg-gray-50 flex">
       {isLoading && <FullscreenLoader />}
       {field && <DrawingModeBanner />}
-      <div className="w-1/2 border-r flex flex-col max-w-1/2">
+      <div className="w-1/2 border-r flex flex-col max-w-1/2 ">
         <PDFAnnotator />
       </div>
+      
 
       {/* Sidebar Panel */}
       {file ? (
