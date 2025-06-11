@@ -18,7 +18,7 @@ export const DialogExportedName = ({
   isActive: boolean;
   setIsActive: (val: boolean) => void;
 }) => {
-  const { config, updateConfig, id } = useCurrentPdf();
+  const { config, id, setExportedName, exportedName } = useCurrentPdf();
   const [value, setValue] = useState("");
 
   if (!config || !id) return null;
@@ -30,16 +30,13 @@ export const DialogExportedName = ({
   };
 
   const handleUpdateFileName = () => {
-    const newValue = value.trim() !== "" ? value : config.exportedName;
+    const newValue = value.trim() !== "" ? value : exportedName;
 
-    if (newValue == config.exportedName) {
+    if (newValue == exportedName) {
       setIsActive(false);
       return;
     } else {
-      const newConfig = config;
-      newConfig.exportedName = newValue;
-
-      updateConfig(id, newConfig);
+      setExportedName(newValue);
       successMessage("Exported Name updated!");
       setIsActive(false);
     }

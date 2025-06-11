@@ -2,7 +2,14 @@ import { usePdfStore } from "@/store/usePdfStore";
 import { useMemo } from "react";
 
 export const useCurrentPdf = () => {
-  const { currentPdf, updateConfig, currentId } = usePdfStore();
+  const {
+    currentPdf,
+    updateConfig,
+    currentId,
+    updateDimensions,
+    exportedName,
+    setExportedName,
+  } = usePdfStore();
 
   const pdf = useMemo(() => currentPdf(), [currentId]);
 
@@ -12,5 +19,10 @@ export const useCurrentPdf = () => {
     config: pdf?.config,
     updateConfig,
     id: pdf?.id,
+    width: pdf?.width,
+    height: pdf?.height,
+    updateDimensions: updateDimensions,
+    exportedName,
+    setExportedName,
   };
 };

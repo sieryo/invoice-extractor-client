@@ -1,33 +1,43 @@
-import { usePdfStore } from "@/store/usePdfStore";
+import { cn } from "@/lib/utils";
+import { type PdfItem } from "@/store/usePdfStore";
 import { Document, Page } from "react-pdf";
 
-export const PdfCard = () => {
-  const { file, width, height } = usePdfStore();
-
-  const newWidth = width * 0.28;
-  const newHeight = height * 0.28;
-
+export const PdfCard = ({
+  pdf,
+  width,
+  height,
+  isActive,
+}: {
+  pdf: PdfItem;
+  width: number;
+  height: number;
+  isActive: boolean;
+}) => {
   return (
     <div
       style={{
-        width: newWidth,
+        width: width,
       }}
-      className="  h-full  "
+      className="h-full relative"
     >
-      <p className=" text-center">1</p>
-      {file && width && height && (
+      <div className=" absolute top-[-25px]">
+        <p className={cn(" text-sm text-gray-600", isActive && "text-gray-900" )}>{pdf.config.fileName}</p>
+      </div>
+      {pdf.file && width && height && (
         <div
           style={{
             position: "relative",
-            width: newWidth,
-            height: newHeight,
+            width: width,
           }}
         >
-          <Document file={file}>
+          <Document file={pdf.file}>
             <Page
-              className={"border-2 border-blue-400"}
+              className={cn(
+                `border-2 hover:border-blue-400 transition`,
+                isActive && "border-blue-400"
+              )}
               pageNumber={1}
-              width={newWidth}
+              width={width}
               renderMode="canvas"
               scale={1}
             />

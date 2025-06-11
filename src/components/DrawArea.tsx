@@ -41,7 +41,7 @@ export const DrawArea = ({ scale }: { scale: number }) => {
       };
       setBoxes([box]);
     }
-  }, [field]);
+  }, [field, id]);
 
   if (!config || !id) return null;
 

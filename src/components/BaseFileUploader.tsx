@@ -16,7 +16,7 @@ export const BaseFileUploader = ({ onSuccessUpload }: {onSuccessUpload?: () => v
           onSuccessUpload()
       }
     } else {
-      alert("Mohon upload file PDF");
+      alert("Please upload PDF file");
     }
   };
   return (

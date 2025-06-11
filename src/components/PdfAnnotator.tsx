@@ -1,33 +1,32 @@
 import { Document, Page, pdfjs } from "react-pdf";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 
 import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-import FileUploader from "./FileUploader";
-import { usePdfStore } from "@/store/usePdfStore";
 import { DrawArea } from "./DrawArea";
 import { Button } from "./ui/button";
-import { SheetIcon, ZoomIn, ZoomOut } from "lucide-react";
+import { AlignJustify, ZoomIn, ZoomOut } from "lucide-react";
 
 import { DialogExportedName } from "./DialogExportedName";
 
-import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { PdfCard } from "./PdfCard";
+import { PdfListSheet } from "./PdfListSheet";
+import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 export const PDFAnnotator = () => {
-  const { currentPdf, width, height, setHeight, setWidth } = usePdfStore();
+  const { file, height, width, id, updateDimensions, exportedName } =
+    useCurrentPdf();
 
-  const curPdf = currentPdf();
-
-  const [isOpen, setIsOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const [numPages, setNumPages] = useState<number | null>(null);
   const [scale, setScale] = useState(1.3);
 
   const [isDialogNameActive, setIsDialogNameActive] = useState(false);
+
+  if (!id || !file) return null;
 
   const handleLoadSuccess = async (pdf: pdfjs.PDFDocumentProxy) => {
     try {
@@ -35,10 +34,11 @@ export const PDFAnnotator = () => {
       const page = await pdf.getPage(1);
       const viewport = page.getViewport({ scale: 1 });
 
-      setWidth(viewport.width);
-      setHeight(viewport.height);
+      updateDimensions(id, { width: viewport.width, height: viewport.height });
 
-      setIsDialogNameActive(true);
+      if (!exportedName) {
+        setIsDialogNameActive(true);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -46,37 +46,35 @@ export const PDFAnnotator = () => {
     }
   };
 
-  if (!curPdf) return null;
-
   return (
     <div
       className="items-center  relative"
       style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
     >
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className=" p-2 h-[300px] overflow-auto" side="top">
-          <PdfCard />
-        </SheetContent>
-      </Sheet>
+      <PdfListSheet isOpen={isSheetOpen} setIsOpen={setIsSheetOpen} />
 
       <DialogExportedName
         isActive={isDialogNameActive}
         setIsActive={setIsDialogNameActive}
       />
 
-      <div className="flex gap-2 absolute z-50 mt-4 ">
-        <Button onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>
-          <ZoomOut className="w-5 h-5 text-gray-50" />
-        </Button>
-        <Button onClick={() => setScale((s) => s + 0.25)}>
-          <ZoomIn className="w-5 h-5 text-gray-50" />
-        </Button>
-        <Button onClick={() => setIsOpen(true)}>
-          <SheetIcon className="w-5 h-5 text-gray-50" />
-        </Button>
+      <div className="flex gap-2 absolute z-50 mt-4  w-full ">
+        <div className=" max-w-10 pl-2">
+          <Button onClick={() => setIsSheetOpen(true)}>
+            <AlignJustify className="w-5 h-5 text-gray-50" />
+          </Button>
+        </div>
+        <div className=" w-full justify-center gap-3 flex ">
+          <Button onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>
+            <ZoomOut className="w-5 h-5 text-gray-50" />
+          </Button>
+          <Button onClick={() => setScale((s) => s + 0.25)}>
+            <ZoomIn className="w-5 h-5 text-gray-50" />
+          </Button>
+        </div>
       </div>
 
-      {curPdf.file && width && height && (
+      {file && width && height && (
         <div
           style={{
             maxHeight: "calc(100vh)",
@@ -92,7 +90,7 @@ export const PDFAnnotator = () => {
               height: height * scale,
             }}
           >
-            <Document onLoadSuccess={handleLoadSuccess} file={curPdf.file}>
+            <Document onLoadSuccess={handleLoadSuccess} file={file}>
               <Page
                 pageNumber={1}
                 width={width}

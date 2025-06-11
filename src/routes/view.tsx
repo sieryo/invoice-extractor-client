@@ -1,7 +1,7 @@
 import { PDFAnnotator } from "@/components/PdfAnnotator";
 import { Button } from "@/components/ui/button";
 import { ClassifiedTypeEnum } from "@/models/pdfConfig";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Brackets, ScanText, Type } from "lucide-react";
 import { HeaderField } from "@/components/HeaderField";
 import { useActiveFieldBoxStore } from "@/store/useActiveFieldBoxStore";
@@ -22,9 +22,16 @@ export const Route = createFileRoute("/view")({
 });
 
 function RouteComponent() {
-  const { pdf, config, file } = useCurrentPdf();
+  const { pdf, config, file, exportedName } = useCurrentPdf();
   const field = useActiveFieldBoxStore((state) => state.field);
   const { isLoading, setIsLoading } = useFullScreenLoadingStore();
+
+  const router = useRouter();
+
+  const back = () => {
+    return router.navigate({ to: "/" });
+  };
+
   // useEffect(() => {
   //   const handleBeforeUnload = (e: any) => {
   //     if (!file) return;
@@ -38,7 +45,7 @@ function RouteComponent() {
   //   };
   // }, [file]);
 
-  if (!pdf || !config || !file) return null;
+  if (!pdf || !config || !file) return back();
 
   const handleExport = async () => {
     setIsLoading(true);
@@ -72,7 +79,6 @@ function RouteComponent() {
     };
 
     const newConfig = {
-      exported_name: config.exportedName,
       sections: newSections,
     };
 
@@ -96,7 +102,7 @@ function RouteComponent() {
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const contentDisposition = response.headers["content-disposition"];
-      let filename = `${config.exportedName}.xlsx`;
+      let filename = `test.xlsx`;
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="?(.+)"?/);
         if (match) filename = match[1];
@@ -146,9 +152,7 @@ function RouteComponent() {
       {/* Sidebar Panel */}
       {file ? (
         <div className="w-1/2 bg-gray-50 flex flex-col h-full z-50">
-          <TitleLabel
-            title={config.exportedName ? config.exportedName : "Title Here"}
-          />
+          <h1 className=" p-2 text-2xl">File Name: {config.fileName ? config.fileName : "PDF File Name"}</h1>
           <div className="flex-grow overflow-auto p-4 pb-10">
             <div className=" p-2 ">
               <h2 className=" font-semibold text-xl">Header</h2>

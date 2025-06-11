@@ -6,33 +6,48 @@ import {
 } from "@/lib/constants";
 import type { PdfConfig } from "@/models/pdfConfig";
 
-type PdfItem = {
+export type PdfItem = {
   id: string;
   file: any;
   config: PdfConfig;
+  width: number;
+  height: number;
 };
 
 type PdfStore = {
   pdfs: PdfItem[];
+  exportedName: string;
+  setExportedName: (name: string) => void;
   addPdf: (file: any, config: PdfConfig) => void;
   removePdf: (id: string) => void;
   currentId: string | null;
   setCurrentId: (id: string) => void;
   currentPdf: () => PdfItem | undefined;
   updateConfig: (id: string, newConfig: PdfConfig) => void;
-  width: number;
-  setWidth: (width: number) => void;
-  height: number;
-  setHeight: (height: number) => void;
+  updateDimensions: (
+    id: string,
+    dimensions: { width?: number; height?: number }
+  ) => void;
 };
 
 export const usePdfStore = create<PdfStore>((set, get) => ({
   pdfs: [],
+  exportedName: "",
+  setExportedName: (name) => set(() => ({ exportedName: name })),
   addPdf: (file, config) => {
     const id = uuidv4();
     set((state) => ({
-      pdfs: [...state.pdfs, { id, file, config }],
-      currentId: id, // langsung aktifkan
+      pdfs: [
+        ...state.pdfs,
+        {
+          id,
+          file,
+          config,
+          height: DEFAULT_PDF_VIEWER_HEIGHT,
+          width: DEFAULT_PDF_VIEWER_WIDTH,
+        },
+      ],
+      currentId: id,
     }));
   },
   removePdf: (id) => {
@@ -55,8 +70,17 @@ export const usePdfStore = create<PdfStore>((set, get) => ({
     }));
   },
 
-  width: DEFAULT_PDF_VIEWER_WIDTH,
-  setWidth: (width) => set(() => ({ width })),
-  height: DEFAULT_PDF_VIEWER_HEIGHT,
-  setHeight: (height) => set(() => ({ height })),
+  updateDimensions: (id, { width, height }) => {
+    set((state) => ({
+      pdfs: state.pdfs.map((pdf) =>
+        pdf.id === id
+          ? {
+              ...pdf,
+              ...(width !== undefined ? { width } : {}),
+              ...(height !== undefined ? { height } : {}),
+            }
+          : pdf
+      ),
+    }));
+  },
 }));
