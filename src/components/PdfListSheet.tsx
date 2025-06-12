@@ -1,5 +1,4 @@
 import { usePdfStore } from "@/store/usePdfStore";
-import { PdfCard } from "./PdfCard";
 import {
   Sheet,
   SheetContent,
@@ -29,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DropdownItemDelete } from "./dropdownFile/DropdownItemDelete";
+import { PdfDocumentCard } from "./PdfDocumentCard";
 
 export const PdfListSheet = ({
   isOpen,
@@ -70,6 +70,7 @@ export const PdfListSheet = ({
             const isActive = pdf.id === currentId;
             return (
               <div
+                key={pdf.id}
                 style={{
                   width: newWidth,
                 }}
@@ -89,7 +90,7 @@ export const PdfListSheet = ({
                   }}
                   className="p-0 border-none bg-transparent pointer-events-auto cursor-pointer"
                 >
-                  <PdfCard
+                  <PdfDocumentCard
                     pdf={pdf}
                     key={pdf.id}
                     height={newHeight}
@@ -120,7 +121,7 @@ export const PdfListSheet = ({
             }}
           >
             <div className=" h-full  ">
-              <Button className=" px-8 cursor-pointer">Export</Button>
+              <div className=" p-1.5 bg-gray-900 text-gray-50 font-semibold rounded-md cursor-pointer ">Export</div>
             </div>
           </ExportTouchable>
         </div>

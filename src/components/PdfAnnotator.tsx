@@ -6,12 +6,13 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { DrawArea } from "./DrawArea";
 import { Button } from "./ui/button";
-import { AlignJustify, ZoomIn, ZoomOut } from "lucide-react";
+import { AlignJustify, LoaderCircle, ZoomIn, ZoomOut } from "lucide-react";
 
 import { DialogExportedName } from "./DialogExportedName";
 
 import { PdfListSheet } from "./PdfListSheet";
 import { useCurrentPdf } from "@/hooks/useCurrentPdf";
+import { PdfDocumentLoading } from "./PdfDocumentLoading";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
@@ -65,7 +66,6 @@ export const PDFAnnotator = () => {
         </div>
       </div>
       <div className="flex gap-2   bg-gray-100 p-1.5 items-center   w-full ">
-        
         <div className=" w-full justify-center gap-3 flex ">
           <Button onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>
             <ZoomOut className="w-5 h-5 text-gray-50" />
@@ -79,7 +79,7 @@ export const PDFAnnotator = () => {
       {file && width && height && (
         <div
           style={{
-            maxHeight: "calc(100vh)",
+            maxHeight: "calc(100vh - 70px)",
             overflow: "auto",
             maxWidth: "100%",
             border: "1px solid #ccc",
@@ -92,7 +92,11 @@ export const PDFAnnotator = () => {
               height: height * scale,
             }}
           >
-            <Document onLoadSuccess={handleLoadSuccess} file={file}>
+            <Document
+              onLoadSuccess={handleLoadSuccess}
+              loading={<PdfDocumentLoading />}
+              file={file}
+            >
               <Page
                 pageNumber={1}
                 width={width}

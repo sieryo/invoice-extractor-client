@@ -7,14 +7,13 @@ import {
   type FieldPdfConfig,
 } from "@/models/pdfConfig";
 import { useActiveFieldBoxStore } from "@/store/useActiveFieldBoxStore";
-import { usePdfStore } from "@/store/usePdfStore";
 import { useEffect, useState } from "react";
-import { Layer, Rect, Stage, Group } from "react-konva";
+import { Layer, Rect, Stage, Group, Text } from "react-konva";
 
 export const DrawArea = ({ scale }: { scale: number }) => {
   const { currentBox, handleMouseMove, handleClick, handleCancel } = useBox();
   const [boxes, setBoxes] = useState<BoxState[]>([]);
-  const { field } = useActiveFieldBoxStore();
+  const { field, setField } = useActiveFieldBoxStore();
 
   const { id, config, updateConfig } = useCurrentPdf();
 
@@ -27,7 +26,7 @@ export const DrawArea = ({ scale }: { scale: number }) => {
 
     if (!config) return;
 
-    const configBox = config.sections.header.fields.find((v) => v === field);
+    const configBox = config.sections.header.fields.find((v) => v.classified.method == ClassifiedTypeEnum.BOX);
     if (configBox) {
       const x = configBox.classified.data.x0;
       const y = configBox.classified.data.top;
@@ -38,10 +37,11 @@ export const DrawArea = ({ scale }: { scale: number }) => {
         y,
         width,
         height,
+        title: configBox.label,
       };
       setBoxes([box]);
     }
-  }, [field, id]);
+  }, [field, id, config]);
 
   if (!config || !id) return null;
 
@@ -80,6 +80,7 @@ export const DrawArea = ({ scale }: { scale: number }) => {
     const confirm = window.confirm("Confirm this area?");
     if (confirm) {
       handleUpdate();
+      setField(null);
     }
   };
 

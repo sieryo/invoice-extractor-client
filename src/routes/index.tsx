@@ -1,18 +1,19 @@
-import { createFileRoute } from '@tanstack/react-router'
-import FileUploader from '@/components/FileUploader'
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { UploadPage } from "@/components/UploadPage";
 
-
-
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: App,
-})
+});
 
 function App() {
+  const router = useRouter();
   return (
     <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <FileUploader />
-      </header>
+      <UploadPage
+        onSuccessUpload={() => {
+          router.navigate({ to: "/view" });
+        }}
+      />
     </div>
-  )
+  );
 }

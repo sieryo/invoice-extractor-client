@@ -7,6 +7,7 @@ export type BoxState = null | {
   width: number;
   height: number;
   stroke?: string;
+  title?: string
 };
 
 export const useBox = () => {

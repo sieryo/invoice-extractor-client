@@ -15,6 +15,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { UploadPage } from "@/components/UploadPage";
 
 export const Route = createFileRoute("/view")({
   component: RouteComponent,
@@ -22,13 +23,7 @@ export const Route = createFileRoute("/view")({
 
 function RouteComponent() {
   const { pdf, config, file } = useCurrentPdf();
-  const field = useActiveFieldBoxStore((state) => state.field);
-
-  const router = useRouter();
-
-  const back = () => {
-    return router.navigate({ to: "/" });
-  };
+  const { field } = useActiveFieldBoxStore();
 
   // useEffect(() => {
   //   const handleBeforeUnload = (e: any) => {
@@ -43,7 +38,7 @@ function RouteComponent() {
   //   };
   // }, [file]);
 
-  if (!pdf || !config || !file) return back();
+  if (!pdf || !config || !file) return <UploadPage />;
 
   return (
     <div className="w-full h-screen bg-gray-50 flex">
@@ -54,7 +49,9 @@ function RouteComponent() {
           className="min-h-[200px]  rounded-lg border"
         >
           <ResizablePanel defaultSize={70}>
-            <PDFAnnotator />
+            <div className=" flex- flex-col h-full">
+              <PDFAnnotator />
+            </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={30} maxSize={40} minSize={25}>
