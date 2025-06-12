@@ -33,7 +33,7 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <RouterProvider router={router} />
-      <Toaster />
+      <Toaster position="top-center" />
     </StrictMode>
   );
 }

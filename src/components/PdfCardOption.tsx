@@ -53,7 +53,7 @@ export const PdfCardOption = ({ pdf }: { pdf: PdfItem }) => {
     };
 
     toast.success("Config has been pasted successfully", {
-      position: "top-right",
+      position: "top-center",
       richColors: true,
     });
     updateConfig(pdf.id, newConfig);
