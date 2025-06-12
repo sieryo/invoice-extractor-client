@@ -11,7 +11,6 @@ import {
   DEFAULT_PDF_VIEWER_WIDTH,
 } from "@/lib/constants";
 import { BaseFileUploader } from "./BaseFileUploader";
-import { useActiveFieldBoxStore } from "@/store/useActiveFieldBoxStore";
 import { TitleLabel } from "./TitleLabel";
 import { ExportTouchable } from "./ExportTouchable";
 import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
@@ -28,6 +27,8 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
+  DragOverlay,
+  type DragStartEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -37,15 +38,16 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState } from "react";
+import { EditorMode, useModeStore } from "@/store/useModeStore";
+import { FileText } from "lucide-react";
 
 const DEFAULT_SCALE = 0.32;
 
 export const PdfListSheet = () => {
   const { pdfs, setCurrentId, currentId, exportedName, setPdfs } =
     usePdfStore();
-  const { setField } = useActiveFieldBoxStore();
+  const { setField, setMode, getCurrentMode } = useModeStore();
   const { setIsLoading } = useFullScreenLoadingStore();
-  const [isSorting, setIsSorting] = useState(false);
 
   const { isOpen, setIsOpen } = usePdfListSheetStore();
 
@@ -66,8 +68,17 @@ export const PdfListSheet = () => {
 
   const sensors = useSensors(useSensor(PointerSensor));
 
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const activePdf = pdfs.find((pdf) => pdf.id === activeId) || null;
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveId(null);
+
     if (active.id !== over?.id) {
       const oldIndex = pdfs.findIndex((item) => item.id === active.id);
       // @ts-expect-error
@@ -78,10 +89,6 @@ export const PdfListSheet = () => {
       setPdfs(reordered);
     }
   };
-
-  useEffect(() => {
-    console.log(isSorting)
-  }, [isSorting])
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -96,12 +103,13 @@ export const PdfListSheet = () => {
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
             <SortableContext
               items={pdfs}
               strategy={horizontalListSortingStrategy}
-              disabled={!isSorting}
+              disabled={!(getCurrentMode() == EditorMode.Drag)}
             >
               {pdfs.map((pdf) => {
                 return (
@@ -112,17 +120,40 @@ export const PdfListSheet = () => {
                     height={newHeight}
                     width={newWidth}
                     handleOnClick={() => {
-                      console.log("HERE!");
                       handleClick(pdf.id);
                     }}
                   />
                 );
               })}
             </SortableContext>
+            <DragOverlay adjustScale={false} style={{ transformOrigin: "0 0" }}>
+              {activePdf ? (
+                <div
+                  className="bg-white border border-dashed border-gray-400 rounded-md shadow-md opacity-80 flex-col"
+                  style={{
+                    width: newWidth,
+                    height: newHeight,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 12,
+                    color: "#555",
+                    padding: 8,
+                  }}
+                >
+                  <div>
+                    <FileText className=" w-5 h-5 text-black" />
+                  </div>
+                  <div>{activePdf.config?.fileName || "Dragging..."}</div>
+                </div>
+              ) : null}
+            </DragOverlay>
           </DndContext>
           <div
             style={{ width: newWidth }}
-            className="h-full bg-gray-100 border relative border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-500 hover:bg-gray-200 transition cursor-pointer"
+            className={cn(
+              "h-full bg-gray-100 border relative border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-500 hover:bg-gray-200 transition"
+            )}
           >
             <div className="text-5xl font-light leading-none">+</div>
             <div className="text-sm mt-1">PDF</div>
@@ -133,15 +164,20 @@ export const PdfListSheet = () => {
         <div className=" flex gap-3">
           <div>
             <div className=" h-full   ">
-              <div 
-              onClick={() => {
-                if (isSorting) {
-                  setIsSorting(false)
-                } else {
-                  setIsSorting(true)
-                }
-              }}
-              className=" p-2 px-6 bg-gray-100 text-gray-900 font-semibold rounded-md cursor-pointer ">
+              <div
+                onClick={() => {
+                  if (getCurrentMode() == EditorMode.Drag) {
+                    setMode(EditorMode.Cursor);
+                  } else {
+                    setMode(EditorMode.Drag);
+                  }
+                }}
+                className={cn(
+                  " p-2 px-6 bg-gray-100 border-gray-300 border text-gray-900 font-semibold rounded-md cursor-pointer ",
+                  getCurrentMode() == EditorMode.Drag &&
+                    " bg-blue-300 border-blue-400 text-blue-700"
+                )}
+              >
                 Toggle Drag
               </div>
             </div>
@@ -211,7 +247,7 @@ const PdfCard = ({
 
       <button
         onClick={handleOnClick}
-        className="p-0 border-none bg-transparent pointer-events-auto cursor-pointer h-full"
+        className="p-0 border-none bg-transparent pointer-events-auto cursor-pointer h-full "
       >
         <PdfDocumentCard
           pdf={pdf}

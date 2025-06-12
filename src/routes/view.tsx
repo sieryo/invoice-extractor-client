@@ -4,8 +4,6 @@ import { ClassifiedTypeEnum } from "@/models/pdfConfig";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Brackets, ScanText, Type } from "lucide-react";
 import { HeaderField } from "@/components/HeaderField";
-import { useActiveFieldBoxStore } from "@/store/useActiveFieldBoxStore";
-import { DrawingModeBanner } from "@/components/DrawingModeBanner";
 import { TableFieldForm } from "@/components/TableFieldForm";
 
 import { TableForm } from "@/components/TableForm";
@@ -17,6 +15,8 @@ import {
 } from "@/components/ui/resizable";
 import { UploadPage } from "@/components/UploadPage";
 import { PdfListSheet } from "@/components/PdfListSheet";
+import { EditorMode, useModeStore } from "@/store/useModeStore";
+import { ModeBanner } from "@/components/ModeBanner";
 
 export const Route = createFileRoute("/view")({
   component: RouteComponent,
@@ -24,7 +24,6 @@ export const Route = createFileRoute("/view")({
 
 function RouteComponent() {
   const { pdf, config, file } = useCurrentPdf();
-  const { field } = useActiveFieldBoxStore();
 
   // useEffect(() => {
   //   const handleBeforeUnload = (e: any) => {
@@ -45,7 +44,7 @@ function RouteComponent() {
     <div className="w-full h-screen bg-gray-50 flex">
       <PdfListSheet />
 
-      {field && <DrawingModeBanner />}
+      <ModeBanner />
       <div className=" w-full h-full flex">
         <ResizablePanelGroup
           direction="horizontal"

@@ -6,7 +6,7 @@ import {
   type Box,
   type FieldPdfConfig,
 } from "@/models/pdfConfig";
-import { useActiveFieldBoxStore } from "@/store/useActiveFieldBoxStore";
+import { useModeStore } from "@/store/useModeStore";
 import type { PdfItem } from "@/store/usePdfStore";
 import { useEffect, useState } from "react";
 import { Layer, Rect, Stage, Group, Text } from "react-konva";
@@ -14,7 +14,7 @@ import { Layer, Rect, Stage, Group, Text } from "react-konva";
 export const DrawArea = ({ scale, pdf }: { scale: number; pdf?: PdfItem }) => {
   const { currentBox, handleMouseMove, handleClick, handleCancel } = useBox();
   const [boxes, setBoxes] = useState<BoxState[]>([]);
-  const { field, setField } = useActiveFieldBoxStore();
+  const { field, setField } = useModeStore();
 
   const { id, config: curConfig, updateConfig } = useCurrentPdf();
 

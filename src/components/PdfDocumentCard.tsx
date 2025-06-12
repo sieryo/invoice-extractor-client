@@ -34,7 +34,7 @@ export const PdfDocumentCard = ({
             isActive && "border-blue-400"
           )}
         >
-          <Document className={"w-full h-full overflow-hidden flex items-center justify-center"} loading={<PdfDocumentLoading />} file={pdf.file}>
+          <Document className={"w-full h-full  overflow-hidden flex items-center justify-center"} loading={<PdfDocumentLoading />} file={pdf.file}>
             <Page
               // className={cn(`border-2 hover:border-blue-400 transition`)}
               pageNumber={1}
