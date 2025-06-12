@@ -18,21 +18,25 @@ export const PdfDocumentCard = ({
   isActive: boolean;
   scale: number;
 }) => {
-  const url = URL.createObjectURL(pdf.file);
-
   return (
     <div>
-      {url && width && height && (
+      {pdf.file && width && height && (
         <div
-          style={{ position: "relative", width }}
-          className="h-full bg-gray-100 border relative border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-500 hover:bg-gray-200 transition cursor-pointer"
+          style={{
+            position: "relative",
+            width,
+            height,
+            maxHeight: height,
+            maxWidth: width
+          }}
+          className={cn(
+            "h-full bg-gray-100 border-2 relative border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-500 hover:border-blue-400 transition cursor-pointer",
+            isActive && "border-blue-400"
+          )}
         >
-          <Document loading={<PdfDocumentLoading />} file={url} >
+          <Document className={"w-full h-full overflow-hidden flex items-center justify-center"} loading={<PdfDocumentLoading />} file={pdf.file}>
             <Page
-              className={cn(
-                `border-2 hover:border-blue-400 transition`,
-                isActive && "border-blue-400"
-              )}
+              // className={cn(`border-2 hover:border-blue-400 transition`)}
               pageNumber={1}
               width={width}
               renderMode="canvas"
