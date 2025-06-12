@@ -6,13 +6,13 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { DrawArea } from "./DrawArea";
 import { Button } from "./ui/button";
-import { AlignJustify, LoaderCircle, ZoomIn, ZoomOut } from "lucide-react";
+import { ZoomIn, ZoomOut } from "lucide-react";
 
 import { DialogExportedName } from "./DialogExportedName";
 
-import { PdfListSheet } from "./PdfListSheet";
 import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 import { PdfDocumentLoading } from "./PdfDocumentLoading";
+import { PdfListSheetTrigger } from "./PdfListSheetTrigger";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
@@ -20,7 +20,6 @@ export const PDFAnnotator = () => {
   const { file, height, width, id, updateDimensions, exportedName } =
     useCurrentPdf();
 
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const [numPages, setNumPages] = useState<number | null>(null);
   const [scale, setScale] = useState(1.3);
@@ -52,18 +51,12 @@ export const PDFAnnotator = () => {
       className="items-center  relative"
       style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
     >
-      <PdfListSheet isOpen={isSheetOpen} setIsOpen={setIsSheetOpen} />
-
       <DialogExportedName
         isActive={isDialogNameActive}
         setIsActive={setIsDialogNameActive}
       />
       <div className=" absolute left-0 top-[8px]">
-        <div className=" max-w-10 pl-2">
-          <Button onClick={() => setIsSheetOpen(true)}>
-            <AlignJustify className="w-5 h-5 text-gray-50" />
-          </Button>
-        </div>
+        <PdfListSheetTrigger />
       </div>
       <div className="flex gap-2   bg-gray-100 p-1.5 items-center   w-full ">
         <div className=" w-full justify-center gap-3 flex ">

@@ -16,6 +16,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { UploadPage } from "@/components/UploadPage";
+import { PdfListSheet } from "@/components/PdfListSheet";
 
 export const Route = createFileRoute("/view")({
   component: RouteComponent,
@@ -42,6 +43,8 @@ function RouteComponent() {
 
   return (
     <div className="w-full h-screen bg-gray-50 flex">
+      <PdfListSheet />
+
       {field && <DrawingModeBanner />}
       <div className=" w-full h-full flex">
         <ResizablePanelGroup
@@ -108,9 +111,9 @@ function RouteComponent() {
                     </div>
                   </div>
                 </div>
-                <div className="p-4 flex justify-end gap-2">
+                {/* <div className="p-4 flex justify-end gap-2">
                   <Button className=" px-8">Save Config</Button>
-                </div>
+                </div> */}
               </div>
             ) : (
               <div className="w-1/2 bg-gray-50 items-center justify-center flex flex-col h-full z-50">

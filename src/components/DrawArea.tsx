@@ -7,15 +7,18 @@ import {
   type FieldPdfConfig,
 } from "@/models/pdfConfig";
 import { useActiveFieldBoxStore } from "@/store/useActiveFieldBoxStore";
+import type { PdfItem } from "@/store/usePdfStore";
 import { useEffect, useState } from "react";
 import { Layer, Rect, Stage, Group, Text } from "react-konva";
 
-export const DrawArea = ({ scale }: { scale: number }) => {
+export const DrawArea = ({ scale, pdf }: { scale: number; pdf?: PdfItem }) => {
   const { currentBox, handleMouseMove, handleClick, handleCancel } = useBox();
   const [boxes, setBoxes] = useState<BoxState[]>([]);
   const { field, setField } = useActiveFieldBoxStore();
 
-  const { id, config, updateConfig } = useCurrentPdf();
+  const { id, config: curConfig, updateConfig } = useCurrentPdf();
+
+  const config = pdf ? pdf.config : curConfig;
 
   useEffect(() => {
     if (!field) {
@@ -26,7 +29,9 @@ export const DrawArea = ({ scale }: { scale: number }) => {
 
     if (!config) return;
 
-    const configBox = config.sections.header.fields.find((v) => v.classified.method == ClassifiedTypeEnum.BOX);
+    const configBox = config.sections.header.fields.find(
+      (v) => v.classified.method == ClassifiedTypeEnum.BOX
+    );
     if (configBox) {
       const x = configBox.classified.data.x0;
       const y = configBox.classified.data.top;

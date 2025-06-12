@@ -16,6 +16,7 @@ export type PdfItem = {
 
 type PdfStore = {
   pdfs: PdfItem[];
+  setPdfs: (pdfs: PdfItem[] | ((prev: PdfItem[]) => PdfItem[])) => void;
   exportedName: string;
   setExportedName: (name: string) => void;
   addPdf: (file: any, config: PdfConfig) => void;
@@ -32,6 +33,10 @@ type PdfStore = {
 
 export const usePdfStore = create<PdfStore>((set, get) => ({
   pdfs: [],
+  setPdfs: (pdfs) =>
+    set((state) => ({
+      pdfs: typeof pdfs === "function" ? pdfs(state.pdfs) : pdfs,
+    })),
   exportedName: "",
   setExportedName: (name) => set(() => ({ exportedName: name })),
   addPdf: (file, config) => {
@@ -51,10 +56,25 @@ export const usePdfStore = create<PdfStore>((set, get) => ({
     }));
   },
   removePdf: (id) => {
-    set((state) => ({
-      pdfs: state.pdfs.filter((p) => p.id !== id),
-      currentId: state.currentId === id ? null : state.currentId,
-    }));
+    set((state) => {
+      const filtered = state.pdfs.filter((p) => p.id !== id);
+      let newCurrentId = state.currentId;
+
+      if (state.currentId === id) {
+        const index = state.pdfs.findIndex((p) => p.id === id);
+        if (index !== -1 && filtered.length > 0) {
+          const nextItem = filtered[index] || filtered[index - 1];
+          newCurrentId = nextItem ? nextItem.id : null;
+        } else {
+          newCurrentId = null;
+        }
+      }
+
+      return {
+        pdfs: filtered,
+        currentId: newCurrentId,
+      };
+    });
   },
   currentId: null,
   setCurrentId: (id) => set(() => ({ currentId: id })),

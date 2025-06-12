@@ -11,7 +11,6 @@ export class PdfConfigManager {
 
   constructor(exportedName: string) {
     this.config = {
-      exportedName,
       fileName: exportedName,
       sections: {
         header: {
@@ -32,7 +31,7 @@ export class PdfConfigManager {
         label: "Invoice Number",
         classified: {
           method: ClassifiedTypeEnum.KEYWORD,
-          data: "No. Invoice",
+          data: "Invoice No",
         },
       },
       {
@@ -92,7 +91,6 @@ export class PdfConfigManager {
     ];
 
     const config: PdfConfig = {
-      exportedName: fileName,
       fileName: fileName,
       sections: {
         header: {
