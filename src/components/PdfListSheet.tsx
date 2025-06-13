@@ -55,7 +55,7 @@ export const PdfListSheet = () => {
   const newHeight = DEFAULT_PDF_VIEWER_HEIGHT * DEFAULT_SCALE;
 
   const handleSuccessUpload = () => {
-    setIsOpen(false);
+    // setIsOpen(false);
   };
 
   const handleClick = (id: string) => {
@@ -97,7 +97,10 @@ export const PdfListSheet = () => {
           <SheetTitle>
             <TitleLabel title={title} />
           </SheetTitle>
-          <SheetDescription></SheetDescription>
+          <SheetDescription>
+            When exporting this file to Excel, each Excel row (e.g., Row 1, Row 2,
+            etc.) is displayed from left to right across the PDF.
+          </SheetDescription>
         </SheetHeader>
         <div className=" flex gap-12">
           <DndContext

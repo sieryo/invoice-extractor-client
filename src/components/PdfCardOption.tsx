@@ -41,7 +41,9 @@ export const PdfCardOption = ({ pdf }: { pdf: PdfItem }) => {
   ];
 
   const handleCopyConfig = () => {
-    setSections(pdf.config.sections);
+    const clonedSections = structuredClone(pdf.config.sections);
+
+    setSections(clonedSections);
   };
 
   const handlePasteConfig = () => {

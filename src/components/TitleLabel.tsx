@@ -14,10 +14,10 @@ export const TitleLabel = ({ title }: { title: string }) => {
         isActive={isDialogNameActive}
         setIsActive={setIsDialogNameActive}
       />
-      <div className=" p-1.5 ">
-        <h1 onClick={handleDoubleClick} className=" font-bold text-xl cursor-pointer">
+      <div className=" ">
+        <p onClick={handleDoubleClick} className=" font-bold text-xl cursor-pointer w-fit  ">
           {title}
-        </h1>
+        </p>
       </div>
     </div>
   );

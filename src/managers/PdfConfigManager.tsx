@@ -43,6 +43,14 @@ export class PdfConfigManager {
         },
       },
       {
+        name: "seller_name",
+        label: "Seller Name",
+        classified: {
+          method: ClassifiedTypeEnum.LINE,
+          data: [1, 1],
+        },
+      },
+      {
         name: "seller_address",
         label: "Seller Address",
         classified: {
@@ -51,11 +59,12 @@ export class PdfConfigManager {
         },
       },
       {
-        name: "seller_name",
-        label: "Seller Name",
+        name: "buyer_name",
+        label: "Buyer Name",
         classified: {
-          method: ClassifiedTypeEnum.LINE,
-          data: [1, 1],
+          method: ClassifiedTypeEnum.KEYWORD,
+          data: "Customer Name",
+          isMultiword: true,
         },
       },
       {
@@ -69,15 +78,6 @@ export class PdfConfigManager {
             top: 10,
             bottom: 20,
           },
-        },
-      },
-      {
-        name: "buyer_name",
-        label: "Buyer Name",
-        classified: {
-          method: ClassifiedTypeEnum.KEYWORD,
-          data: "Customer Name",
-          isMultiword: true,
         },
       },
     ];

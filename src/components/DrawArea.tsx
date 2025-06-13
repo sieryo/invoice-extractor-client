@@ -6,7 +6,7 @@ import {
   type Box,
   type FieldPdfConfig,
 } from "@/models/pdfConfig";
-import { useModeStore } from "@/store/useModeStore";
+import { EditorMode, useModeStore } from "@/store/useModeStore";
 import type { PdfItem } from "@/store/usePdfStore";
 import { useEffect, useState } from "react";
 import { Layer, Rect, Stage, Group, Text } from "react-konva";
@@ -14,11 +14,12 @@ import { Layer, Rect, Stage, Group, Text } from "react-konva";
 export const DrawArea = ({ scale, pdf }: { scale: number; pdf?: PdfItem }) => {
   const { currentBox, handleMouseMove, handleClick, handleCancel } = useBox();
   const [boxes, setBoxes] = useState<BoxState[]>([]);
-  const { field, setField } = useModeStore();
+  const { field, setMode } = useModeStore();
 
   const { id, config: curConfig, updateConfig } = useCurrentPdf();
 
   const config = pdf ? pdf.config : curConfig;
+
 
   useEffect(() => {
     if (!field) {
@@ -85,7 +86,7 @@ export const DrawArea = ({ scale, pdf }: { scale: number; pdf?: PdfItem }) => {
     const confirm = window.confirm("Confirm this area?");
     if (confirm) {
       handleUpdate();
-      setField(null);
+      setMode(EditorMode.Cursor);
     }
   };
 

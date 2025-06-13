@@ -53,7 +53,7 @@ export const TableForm = ({}: {}) => {
   return (
     <div>
       <div className=" p-2">
-        <h2 className=" font-semibold text-xl">Products / Table</h2>
+        <h2 className=" font-semibold text-xl">Products / Table Sections</h2>
         <div>
           <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm my-1.5">
             <div className="space-y-0.5">

@@ -59,13 +59,12 @@ function RouteComponent() {
           <ResizablePanel defaultSize={30} maxSize={40} minSize={25}>
             {file ? (
               <div className="flex flex-col h-full z-50">
-                <h1 className=" p-2 text-xl">
-                  File Name:
+                <h1 className=" p-2 text-xl font-semibold">
                   {config.fileName ? config.fileName : "PDF File Name"}
                 </h1>
                 <div className="flex-grow overflow-auto p-4 pb-10">
                   <div className=" p-2 ">
-                    <h2 className=" font-semibold text-xl">Header</h2>
+                    <h2 className=" font-semibold text-lg">Header Sections</h2>
                   </div>
                   <div className=" flex flex-col gap-6">
                     {config.sections.header.fields.map((field) => {
