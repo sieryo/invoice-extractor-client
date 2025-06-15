@@ -4,6 +4,7 @@ import { Document, Page } from "react-pdf";
 import { PdfDocumentLoading } from "./PdfDocumentLoading";
 import { DrawArea } from "./DrawArea";
 import { useMemo } from "react";
+import { FileText } from "lucide-react";
 
 export const PdfDocumentCard = ({
   pdf,
@@ -27,14 +28,16 @@ export const PdfDocumentCard = ({
             width,
             height,
             maxHeight: height,
-            maxWidth: width
+            maxWidth: width,
           }}
           className={cn(
-            "h-full bg-gray-100 border-2 relative border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-500 hover:border-blue-400 transition cursor-pointer",
+            "h-full bg-gray-100 border-4 relative border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-500 hover:border-blue-400 transition cursor-pointer",
             isActive && "border-blue-400"
           )}
         >
-          <Document className={"w-full h-full  overflow-hidden flex items-center justify-center"} loading={<PdfDocumentLoading />} file={pdf.file}>
+          <FileText className={cn(" w-5 h-5 text-gray-800", isActive && "text-blue-500")} />
+
+          {/* <Document className={"w-full h-full  overflow-hidden flex justify-center items-center"} loading={<PdfDocumentLoading />} file={pdf.file}>
             <Page
               // className={cn(`border-2 hover:border-blue-400 transition`)}
               pageNumber={1}
@@ -43,7 +46,7 @@ export const PdfDocumentCard = ({
               scale={1}
             />
           </Document>
-          <DrawArea scale={scale} pdf={pdf} />
+          <DrawArea width={width} height={height} scale={1} pdf={pdf} /> */}
         </div>
       )}
     </div>

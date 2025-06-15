@@ -11,7 +11,7 @@ export const useCurrentPdf = () => {
     setExportedName,
   } = usePdfStore();
 
-  const pdf = useMemo(() => currentPdf(), [currentId]);
+  const pdf = currentPdf()
 
   return {
     pdf,

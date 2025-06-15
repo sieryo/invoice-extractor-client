@@ -12,7 +12,13 @@ import { usePdfStore, type PdfItem } from "@/store/usePdfStore";
 import { useCopyConfigStore } from "@/store/useCopyConfigStore";
 import { toast } from "sonner";
 
-export const PdfCardOption = ({ pdf }: { pdf: PdfItem }) => {
+export const PdfCardOption = ({
+  disabled,
+  pdf,
+}: {
+  disabled: boolean;
+  pdf: PdfItem;
+}) => {
   const { updateConfig } = usePdfStore();
   const { sections, setSections } = useCopyConfigStore();
 
@@ -64,7 +70,11 @@ export const PdfCardOption = ({ pdf }: { pdf: PdfItem }) => {
   return (
     <div className=" pt-1 z-50">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild className=" cursor-pointer">
+        <DropdownMenuTrigger
+          disabled={disabled}
+          asChild
+          className=" cursor-pointer"
+        >
           <EllipsisVertical className="w-4 h-4 text-gray-900" />
         </DropdownMenuTrigger>
         <DropdownMenuContent>

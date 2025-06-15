@@ -11,7 +11,17 @@ import type { PdfItem } from "@/store/usePdfStore";
 import { useEffect, useState } from "react";
 import { Layer, Rect, Stage, Group, Text } from "react-konva";
 
-export const DrawArea = ({ scale, pdf }: { scale: number; pdf?: PdfItem }) => {
+export const DrawArea = ({
+  width,
+  height,
+  scale,
+  pdf,
+}: {
+  width: number;
+  height: number;
+  scale: number;
+  pdf?: PdfItem;
+}) => {
   const { currentBox, handleMouseMove, handleClick, handleCancel } = useBox();
   const [boxes, setBoxes] = useState<BoxState[]>([]);
   const { field, setMode } = useModeStore();
@@ -19,7 +29,6 @@ export const DrawArea = ({ scale, pdf }: { scale: number; pdf?: PdfItem }) => {
   const { id, config: curConfig, updateConfig } = useCurrentPdf();
 
   const config = pdf ? pdf.config : curConfig;
-
 
   useEffect(() => {
     if (!field) {
@@ -78,6 +87,7 @@ export const DrawArea = ({ scale, pdf }: { scale: number; pdf?: PdfItem }) => {
     }
     successMessage("Area Updated!");
     setBoxes([currentBox]);
+    console.log(currentBox)
   };
 
   const isDrawingMode = field?.classified.method === ClassifiedTypeEnum.BOX;
@@ -98,8 +108,8 @@ export const DrawArea = ({ scale, pdf }: { scale: number; pdf?: PdfItem }) => {
   return (
     <Stage
       className={`${isDrawingMode ? "z-40" : ""}`}
-      width={600 * scale}
-      height={800 * scale}
+      width={width * scale}
+      height={height * scale}
       scaleX={scale}
       scaleY={scale}
       style={{

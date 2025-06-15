@@ -83,6 +83,11 @@ export class PdfConfigManager {
     ];
 
     const tableFields: TableField[] = [
+      {
+        name: "no",
+        type: DataTypeEnum.INT,
+        columnName: "No",
+      },
       { columnName: "SKU", name: "sku", type: DataTypeEnum.STRING },
       { columnName: "Product Name", name: "name", type: DataTypeEnum.STRING },
       { columnName: "Quantity", name: "quantity", type: DataTypeEnum.INT },

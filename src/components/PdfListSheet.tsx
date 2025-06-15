@@ -51,8 +51,8 @@ export const PdfListSheet = () => {
 
   const { isOpen, setIsOpen } = usePdfListSheetStore();
 
-  const newWidth = DEFAULT_PDF_VIEWER_WIDTH * DEFAULT_SCALE;
-  const newHeight = DEFAULT_PDF_VIEWER_HEIGHT * DEFAULT_SCALE;
+  const newWidth = 400 * DEFAULT_SCALE;
+  const newHeight = 500 * DEFAULT_SCALE;
 
   const handleSuccessUpload = () => {
     // setIsOpen(false);
@@ -92,17 +92,19 @@ export const PdfListSheet = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetContent className=" p-2 h-[450px] px-4 overflow-auto" side="top">
+      <SheetContent className=" p-2 min-h-[450px] px-4 overflow-auto flex-wrap" side="top">
         <SheetHeader>
           <SheetTitle>
-            <TitleLabel title={title} />
+           <p className=" text-2xl">
+            List Pdf
+           </p>
           </SheetTitle>
           <SheetDescription>
-            When exporting this file to Excel, each Excel row (e.g., Row 1, Row 2,
+            When exporting this list to Excel, each Excel row (e.g., Row 1, Row 2,
             etc.) is displayed from left to right across the PDF.
           </SheetDescription>
         </SheetHeader>
-        <div className=" flex gap-12">
+        <div className=" flex gap-12 flex-wrap">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -125,6 +127,7 @@ export const PdfListSheet = () => {
                     handleOnClick={() => {
                       handleClick(pdf.id);
                     }}
+                    disabled={getCurrentMode() == EditorMode.Drag}
                   />
                 );
               })}
@@ -153,7 +156,7 @@ export const PdfListSheet = () => {
             </DragOverlay>
           </DndContext>
           <div
-            style={{ width: newWidth }}
+            style={{ width: newWidth, height: newHeight }}
             className={cn(
               "h-full bg-gray-100 border relative border-gray-300 rounded-md flex flex-col items-center justify-center text-gray-500 hover:bg-gray-200 transition"
             )}
@@ -214,6 +217,7 @@ const PdfCard = ({
   width,
   handleOnClick,
   height,
+  disabled
 }: {
   id: string;
   pdf: PdfItem;
@@ -221,6 +225,7 @@ const PdfCard = ({
   width: number;
   handleOnClick: () => void;
   height: number;
+  disabled: boolean
 }) => {
   const isActive = pdf.id === currentId;
 
@@ -245,7 +250,7 @@ const PdfCard = ({
     >
       <div className=" absolute top-[-22px] w-full flex justify-between">
         <PdfCardTitle fileName={pdf.config.fileName} isActive={isActive} />
-        <PdfCardOption pdf={pdf} />
+        <PdfCardOption disabled={disabled} pdf={pdf} />
       </div>
 
       <button

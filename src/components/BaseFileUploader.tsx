@@ -3,22 +3,35 @@ import { Input } from "./ui/input";
 import { PdfConfigManager } from "@/managers/PdfConfigManager";
 import { successMessage } from "@/lib/helper";
 
-export const BaseFileUploader = ({ onSuccessUpload }: {onSuccessUpload?: () => void}) => {
+export const BaseFileUploader = ({ onSuccessUpload }: { onSuccessUpload?: () => void }) => {
   const { addPdf } = usePdfStore();
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type === "application/pdf") {
-      const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-      const config = PdfConfigManager.generate(fileNameWithoutExt);
-      addPdf(file, config);
-      successMessage("Upload file success");
-      if (onSuccessUpload) {
-          onSuccessUpload()
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    let uploadedCount = 0;
+
+    Array.from(files).forEach((file) => {
+      if (file.type === "application/pdf") {
+        const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+        const config = PdfConfigManager.generate(fileNameWithoutExt);
+        addPdf(file, config);
+        uploadedCount++;
       }
+    });
+
+    if (uploadedCount > 0) {
+      successMessage(`Upload ${uploadedCount} file(s) success`);
+      onSuccessUpload?.();
     } else {
-      alert("Please upload PDF file");
+      alert("Please upload PDF file(s) only");
     }
+
+    // Reset input agar bisa upload file yang sama lagi
+    e.target.value = "";
   };
+
   return (
     <Input
       id="files"

@@ -43,14 +43,15 @@ function buildFormDataMulti(pdfs: PdfItem[]) {
     formData.append("configs", JSON.stringify(buildExportConfig(pdf.config)));
   });
 
-
-
   return formData;
 }
 
-function triggerDownload(response: any, exportedName: string) {
+function triggerDownload(response: any) {
   const url = window.URL.createObjectURL(new Blob([response.data]));
   const contentDisposition = response.headers["content-disposition"];
+  const exportedName = response.headers.get("X-Exported-Filename");
+
+
   let filename = `${exportedName}.xlsx`;
   if (contentDisposition) {
     const match = contentDisposition.match(/filename="?(.+)"?/);
@@ -114,7 +115,7 @@ export const handleExport = async (
       }
     );
 
-    triggerDownload(response, exportedName);
+    triggerDownload(response);
   } catch (err: any) {
     console.error("Upload error:", err);
     handleErrorResponse(err);

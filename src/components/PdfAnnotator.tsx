@@ -8,8 +8,6 @@ import { DrawArea } from "./DrawArea";
 import { Button } from "./ui/button";
 import { ZoomIn, ZoomOut } from "lucide-react";
 
-import { DialogExportedName } from "./DialogExportedName";
-
 import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 import { PdfDocumentLoading } from "./PdfDocumentLoading";
 import { PdfListSheetTrigger } from "./PdfListSheetTrigger";
@@ -24,8 +22,6 @@ export const PDFAnnotator = () => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [scale, setScale] = useState(1.3);
 
-  const [isDialogNameActive, setIsDialogNameActive] = useState(false);
-
   if (!id || !file) return null;
 
   const handleLoadSuccess = async (pdf: pdfjs.PDFDocumentProxy) => {
@@ -34,11 +30,8 @@ export const PDFAnnotator = () => {
       const page = await pdf.getPage(1);
       const viewport = page.getViewport({ scale: 1 });
 
-      updateDimensions(id, { width: viewport.width, height: viewport.height });
 
-      if (!exportedName) {
-        setIsDialogNameActive(true);
-      }
+      updateDimensions(id, { width: viewport.width, height: viewport.height });
     } catch (err) {
       console.error(err);
     } finally {
@@ -46,15 +39,13 @@ export const PDFAnnotator = () => {
     }
   };
 
+
   return (
     <div
       className="items-center  relative"
       style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
     >
-      <DialogExportedName
-        isActive={isDialogNameActive}
-        setIsActive={setIsDialogNameActive}
-      />
+     
       <div className=" absolute left-0 top-[8px]">
         <PdfListSheetTrigger />
       </div>
@@ -98,7 +89,7 @@ export const PDFAnnotator = () => {
               />
             </Document>
 
-            <DrawArea scale={scale} />
+            <DrawArea width={width} height={height} scale={scale} />
           </div>
         </div>
       )}
