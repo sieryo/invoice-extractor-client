@@ -14,6 +14,13 @@ export type PdfItem = {
   height: number;
 };
 
+export type PdfGroup = {
+  id: string;
+  name: string;
+  config: PdfConfig;
+  pdfs: PdfItem[];
+};
+
 type PdfStore = {
   pdfs: PdfItem[];
   setPdfs: (pdfs: PdfItem[] | ((prev: PdfItem[]) => PdfItem[])) => void;

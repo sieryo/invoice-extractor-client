@@ -11,7 +11,7 @@ function App() {
     <div className="text-center">
       <UploadPage
         onSuccessUpload={() => {
-          router.navigate({ to: "/view" });
+          router.navigate({ to: "/workspace" });
         }}
       />
     </div>

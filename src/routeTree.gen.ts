@@ -11,14 +11,14 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as ViewImport } from './routes/view'
+import { Route as WorkspaceImport } from './routes/workspace'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
 
-const ViewRoute = ViewImport.update({
-  id: '/view',
-  path: '/view',
+const WorkspaceRoute = WorkspaceImport.update({
+  id: '/workspace',
+  path: '/workspace',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,11 +39,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/view': {
-      id: '/view'
-      path: '/view'
-      fullPath: '/view'
-      preLoaderRoute: typeof ViewImport
+    '/workspace': {
+      id: '/workspace'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof WorkspaceImport
       parentRoute: typeof rootRoute
     }
   }
@@ -53,37 +53,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/view': typeof ViewRoute
+  '/workspace': typeof WorkspaceRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/view': typeof ViewRoute
+  '/workspace': typeof WorkspaceRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/view': typeof ViewRoute
+  '/workspace': typeof WorkspaceRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/view'
+  fullPaths: '/' | '/workspace'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/view'
-  id: '__root__' | '/' | '/view'
+  to: '/' | '/workspace'
+  id: '__root__' | '/' | '/workspace'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ViewRoute: typeof ViewRoute
+  WorkspaceRoute: typeof WorkspaceRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ViewRoute: ViewRoute,
+  WorkspaceRoute: WorkspaceRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,14 +97,14 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/view"
+        "/workspace"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/view": {
-      "filePath": "view.tsx"
+    "/workspace": {
+      "filePath": "workspace.tsx"
     }
   }
 }

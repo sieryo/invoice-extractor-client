@@ -14,11 +14,10 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { UploadPage } from "@/components/UploadPage";
-import { PdfListSheet } from "@/components/PdfListSheet";
-import { EditorMode, useModeStore } from "@/store/useModeStore";
 import { ModeBanner } from "@/components/ModeBanner";
+import { SidebarWorkspace } from "@/components/SidebarWorkspace";
 
-export const Route = createFileRoute("/view")({
+export const Route = createFileRoute("/workspace")({
   component: RouteComponent,
 });
 
@@ -42,29 +41,32 @@ function RouteComponent() {
 
   return (
     <div className="w-full h-screen bg-gray-50 flex">
-      <PdfListSheet />
-
       <ModeBanner />
       <div className=" w-full h-full flex">
         <ResizablePanelGroup
           direction="horizontal"
-          className="min-h-[200px]  rounded-lg border"
+          className="min-h-[200px]  rounded-lg border gap-3"
         >
-          <ResizablePanel defaultSize={70}>
+          <ResizablePanel defaultSize={18} minSize={10} maxSize={18}>
+            <div className=" flex- flex-col h-full">
+              <SidebarWorkspace />
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize={50}>
             <div className=" flex- flex-col h-full">
               <PDFAnnotator />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={30} maxSize={40} minSize={25}>
+          <ResizablePanel defaultSize={20} maxSize={25} minSize={20}>
             {file ? (
               <div className="flex flex-col h-full z-50">
-                <h1 className=" p-2 text-xl font-semibold">
-                  {config.fileName ? config.fileName : "PDF File Name"}
-                </h1>
                 <div className="flex-grow overflow-auto p-4 pb-10">
                   <div className=" p-2 ">
-                    <h2 className=" font-semibold text-lg">Header Sections</h2>
+                    <h2 className=" font-semibold text-xl">
+                      Header Sections
+                    </h2>
                   </div>
                   <div className=" flex flex-col gap-6">
                     {config.sections.header.fields.map((field) => {
