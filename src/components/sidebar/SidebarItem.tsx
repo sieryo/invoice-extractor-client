@@ -50,7 +50,7 @@ export const SidebarItems = ({
       ref={setNodeRef}
       onClick={handleClickItem}
       className={cn(
-        "flex items-center justify-between pl-11 pr-1 py-2 group cursor-default transition-colors duration-150",
+        "flex items-center justify-between pl-11 pr-1 py-1.5 group cursor-default transition-colors duration-150",
         isActive ? "bg-gray-300" : "hover:bg-gray-100", isDragging && "opacity-30"
       )}
     >

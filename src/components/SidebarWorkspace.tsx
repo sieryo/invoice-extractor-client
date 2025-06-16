@@ -57,7 +57,7 @@ export const SidebarWorkspace = () => {
   const getIndex = (id: string | null) => groups.findIndex((g) => g.id === id);
 
   return (
-    <div className="bg-white text-gray-900  h-full flex flex-col border-r border-gray-200">
+    <div className="bg-white text-gray-900  h-full flex flex-col  ">
       <div className=" flex justify-between items-center px-4 py-2  ">
         <div className=" text-lg font-semibold">Groups</div>
         <div className=" relative">
@@ -81,7 +81,7 @@ export const SidebarWorkspace = () => {
           </ExportTouchable>
         </div>
       </div>
-      <div className="overflow-y-hidden overflow-x-hidden ">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-10 ">
         <DndContext
           collisionDetection={pointerWithin}
           onDragStart={handleGroupDragStart}

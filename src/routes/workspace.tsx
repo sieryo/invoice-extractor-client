@@ -38,7 +38,6 @@ function RouteComponent() {
   //   };
   // }, [file]);
 
-
   return (
     <div className="w-full h-screen bg-gray-50 flex">
       <ModeBanner />
@@ -48,11 +47,12 @@ function RouteComponent() {
           className="min-h-[200px]  rounded-lg border gap-3"
         >
           <ResizablePanel defaultSize={20} minSize={15} maxSize={20}>
-            <div className=" flex flex-col h-full">
+            <div className=" flex flex-col h-full ">
               <SidebarWorkspace />
             </div>
           </ResizablePanel>
-          <ResizableHandle />
+          <ResizableHandle withHandle />
+
           <ResizablePanel defaultSize={50}>
             <div className=" flex- flex-col h-full">
               <PDFAnnotator />
@@ -62,51 +62,57 @@ function RouteComponent() {
           <ResizablePanel defaultSize={20} maxSize={25} minSize={20}>
             {/* <FileUploader /> */}
             {file ? (
-              <div className="flex flex-col h-full z-50">
+              <div className="flex flex-col h-full z-50 bg-white">
                 <div className="flex-grow overflow-auto p-4 pb-10">
                   <div className=" p-2 ">
                     <h2 className=" font-semibold text-xl">Header Sections</h2>
                   </div>
                   <div className=" flex flex-col gap-6">
-                    {group && group.config.sections.header.fields.map((field) => {
-                      let icon;
-                      let description;
-                      switch (field.classified.method) {
-                        case ClassifiedTypeEnum.KEYWORD:
-                          icon = <ScanText className="w-5 h-5 text-gray-600" />;
-                          description =
-                            "Enter a keyword that indicates to section : ";
-                          break;
-                        case ClassifiedTypeEnum.BOX:
-                          icon = <Brackets className="w-5 h-5 text-gray-600" />;
-                          description = "use draw mode to locate : ";
-                          break;
-                        case ClassifiedTypeEnum.LINE:
-                          icon = <Type className="w-5 h-5 text-gray-600" />;
-                          description =
-                            "Specify the line range (from which row to which row) to locate : ";
+                    {group &&
+                      group.config.sections.header.fields.map((field) => {
+                        let icon;
+                        let description;
+                        switch (field.classified.method) {
+                          case ClassifiedTypeEnum.KEYWORD:
+                            icon = (
+                              <ScanText className="w-5 h-5 text-gray-600" />
+                            );
+                            description =
+                              "Enter a keyword that indicates to section : ";
+                            break;
+                          case ClassifiedTypeEnum.BOX:
+                            icon = (
+                              <Brackets className="w-5 h-5 text-gray-600" />
+                            );
+                            description = "use draw mode to locate : ";
+                            break;
+                          case ClassifiedTypeEnum.LINE:
+                            icon = <Type className="w-5 h-5 text-gray-600" />;
+                            description =
+                              "Specify the line range (from which row to which row) to locate : ";
 
-                          break;
-                      }
+                            break;
+                        }
 
-                      return (
-                        <HeaderField
-                          key={field.name}
-                          field={field}
-                          icon={icon}
-                          description={description}
-                        />
-                      );
-                    })}
+                        return (
+                          <HeaderField
+                            key={field.name}
+                            field={field}
+                            icon={icon}
+                            description={description}
+                          />
+                        );
+                      })}
                   </div>
                   <div>
                     <TableForm />
                     <div className=" flex flex-col gap-6">
-                      {group && group.config.sections.table.tableHeader.map((field) => {
-                        return (
-                          <TableFieldForm key={field.name} field={field} />
-                        );
-                      })}
+                      {group &&
+                        group.config.sections.table.tableHeader.map((field) => {
+                          return (
+                            <TableFieldForm key={field.name} field={field} />
+                          );
+                        })}
                     </div>
                   </div>
                 </div>
