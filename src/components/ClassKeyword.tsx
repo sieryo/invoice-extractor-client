@@ -1,4 +1,3 @@
-import { usePdfStore } from "@/store/usePdfStore";
 import { Input } from "./ui/input";
 
 import {
@@ -38,9 +37,11 @@ export const ClassKeyword = ({
   const [isMultiword, setIsMultiword] = useState(false);
   const data = field.classified.data as any;
   const multiword = field.classified.isMultiword ?? false;
-  const { config, file, id, updateConfig } = useCurrentPdf();
+  const { group, updateConfig } = useCurrentPdf();
 
-  if (!config || !file || !id) return null;
+  if (!group) return null;
+
+  const config = group.config
 
   const handleUpdate = () => {
     const newValue = value.trim() !== "" ? value : data;
@@ -59,7 +60,7 @@ export const ClassKeyword = ({
     if (index !== -1) {
       const newConfig = config;
       newConfig.sections.header.fields[index] = updatedField;
-      updateConfig(id, newConfig);
+      updateConfig(group.id, newConfig);
     }
     successMessage();
     setIsEditing(false);

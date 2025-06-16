@@ -3,6 +3,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { FullscreenLoader } from "@/components/FullScreenLoader";
 
+
 export const Route = createRootRoute({
   component: () => (
     <>

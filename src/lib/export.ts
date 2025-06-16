@@ -1,7 +1,7 @@
 import type { PdfConfig } from "@/models/pdfConfig";
 import { failedMessage } from "./helper";
 import axios from "axios";
-import type { PdfItem } from "@/store/usePdfStore";
+import type { PdfGroup } from "@/store/usePdfStore";
 
 function buildHeaderConfig(config: PdfConfig) {
   return {
@@ -35,12 +35,17 @@ function buildExportConfig(config: PdfConfig) {
   };
 }
 
-function buildFormDataMulti(pdfs: PdfItem[]) {
+function buildFormDataMulti(groups: PdfGroup[]) {
   const formData = new FormData();
 
-  pdfs.forEach((pdf) => {
-    formData.append("files", pdf.file);
-    formData.append("configs", JSON.stringify(buildExportConfig(pdf.config)));
+  groups.forEach((group) => {
+    group.pdfs.forEach((pdf) => {
+      formData.append("files", pdf.file);
+      formData.append(
+        "configs",
+        JSON.stringify(buildExportConfig(group.config))
+      );
+    });
   });
 
   return formData;
@@ -50,7 +55,6 @@ function triggerDownload(response: any) {
   const url = window.URL.createObjectURL(new Blob([response.data]));
   const contentDisposition = response.headers["content-disposition"];
   const exportedName = response.headers.get("X-Exported-Filename");
-
 
   let filename = `${exportedName}.xlsx`;
   if (contentDisposition) {
@@ -90,8 +94,7 @@ function handleErrorResponse(err: any) {
 }
 
 export const handleExport = async (
-  pdfs: PdfItem[],
-  exportedName: string,
+  groups: PdfGroup[],
   onBeforeExport?: () => void,
   onAfterExport?: () => void
 ) => {
@@ -99,9 +102,8 @@ export const handleExport = async (
     onBeforeExport();
   }
 
-  const formData = buildFormDataMulti(pdfs);
+  const formData = buildFormDataMulti(groups);
 
-  console.log(formData);
 
   try {
     const response = await axios.post(

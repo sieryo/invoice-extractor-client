@@ -1,28 +1,17 @@
 import { usePdfStore } from "@/store/usePdfStore";
-import { useMemo } from "react";
 
 export const useCurrentPdf = () => {
-  const {
-    currentPdf,
-    updateConfig,
-    currentId,
-    updateDimensions,
-    exportedName,
-    setExportedName,
-  } = usePdfStore();
+  const { currentPdf, updateConfig, current, updateDimensions, getGroup } =
+    usePdfStore();
 
-  const pdf = currentPdf()
+  const pdf = currentPdf();
 
   return {
+    group: getGroup(current ? current.groupId : ""),
     pdf,
     file: pdf?.file,
-    config: pdf?.config,
     updateConfig,
     id: pdf?.id,
-    width: pdf?.width,
-    height: pdf?.height,
     updateDimensions: updateDimensions,
-    exportedName,
-    setExportedName,
   };
 };

@@ -1,99 +1,132 @@
-import { FileText, EllipsisVertical } from "lucide-react";
-import { usePdfStore, type PdfItem } from "@/store/usePdfStore";
-import { cn } from "@/lib/utils";
+import { Plus } from "lucide-react";
+import { usePdfStore } from "@/store/usePdfStore";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useModeStore } from "@/store/useModeStore";
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+  type DragOverEvent,
+  pointerWithin,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import React, { useState } from "react";
+import { BaseFileUploader } from "./BaseFileUploader";
+import { DropIndicator } from "./DropIndicator";
+import { SidebarGroup } from "./sidebar/SidebarGroup";
+import { ExportTouchable } from "./ExportTouchable";
+import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
+import { SortableGroupWrapper } from "./SortableGroupWrapper";
 
 export const SidebarWorkspace = () => {
-  const { pdfs, setCurrentId, currentId } = usePdfStore();
-  const { setField } = useModeStore();
+  const { groups, current, setGroups } = usePdfStore();
+  const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+  const { setIsLoading } = useFullScreenLoadingStore();
 
-  const handleClickItem = (id: string) => {
-    setCurrentId(id);
-    setField(null);
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  const handleGroupDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    // const group = groups.find((g) => g.id === active.id);
+    setActiveGroupId(active.id as string);
   };
 
+  const handleGroupDragOver = (event: DragOverEvent) => {
+    setOverId(event.over?.id.toString() ?? null);
+  };
+
+  const handleGroupDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveGroupId(null);
+    setOverId(null);
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = groups.findIndex((g) => g.id === active.id);
+    const newIndex = groups.findIndex((g) => g.id === over.id);
+    const newGroups = arrayMove(groups, oldIndex, newIndex);
+    setGroups(newGroups);
+  };
+
+  const getIndex = (id: string | null) => groups.findIndex((g) => g.id === id);
+
   return (
-    <div className=" bg-white text-gray-900 h-full flex flex-col border-r border-gray-200">
-      <div className="px-4 py-2 text-sm font-semibold border-b border-gray-200">
-        PDF List
+    <div className="bg-white text-gray-900  h-full flex flex-col border-r border-gray-200">
+      <div className=" flex justify-between items-center px-4 py-2  ">
+        <div className=" text-lg font-semibold">Groups</div>
+        <div className=" relative">
+          <BaseFileUploader />
+          <Plus className=" w-4 h-4 text-gray-800" />
+        </div>
+        <div>
+          <ExportTouchable
+            onBeforeExport={() => {
+              setIsLoading(true);
+            }}
+            onAfterExport={() => {
+              setIsLoading(false);
+            }}
+          >
+            <div className=" h-full  ">
+              <div className=" p-2 px-6 bg-gray-900 text-gray-50 font-semibold rounded-md cursor-pointer ">
+                Export
+              </div>
+            </div>
+          </ExportTouchable>
+        </div>
       </div>
-      <SidebarWorkspaceContent>
-        {pdfs.map((pdf) => (
-          <SidebarWorkspaceItem
-            key={pdf.id}
-            pdf={pdf}
-            isActive={pdf.id === currentId}
-            onClick={() => handleClickItem(pdf.id)}
-          />
-        ))}
-      </SidebarWorkspaceContent>
-    </div>
-  );
-};
-
-const SidebarWorkspaceContent = ({ children }: { children: React.ReactNode }) => {
-  return <div className="">{children}</div>;
-};
-
-const SidebarWorkspaceItem = ({
-  pdf,
-  isActive,
-  onClick,
-}: {
-  pdf: PdfItem;
-  isActive: boolean;
-  onClick: () => void;
-}) => {
-  return (
-    <div
-      onClick={onClick}
-      className={cn(
-        "flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-100 group",
-        isActive && "bg-gray-200"
-      )}
-    >
-      <div className="flex items-center gap-2 w-[90%]">
-        <FileText className="w-4 h-4 text-gray-500" />
-        <span
-          className={cn(
-            "text-sm truncate w-full",
-            isActive ? "text-gray-900 font-semibold" : "text-gray-700"
-          )}
+      <div className="overflow-y-hidden overflow-x-hidden ">
+        <DndContext
+          collisionDetection={pointerWithin}
+          onDragStart={handleGroupDragStart}
+          onDragEnd={handleGroupDragEnd}
+          onDragOver={handleGroupDragOver}
+          sensors={sensors}
         >
-          {pdf.config.fileName}
-        </span>
+          <SortableContext
+            items={groups.map((g) => g.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {groups.map((group) => {
+              const isOver = overId === group.id && activeGroupId !== overId;
+              const activeIndex = getIndex(activeGroupId);
+              const overIndex = getIndex(overId);
+              const placeIndicatorAbove = activeIndex > overIndex;
+
+              return (
+                <React.Fragment key={group.id}>
+                  {isOver && placeIndicatorAbove && <DropIndicator />}
+
+                  <SortableGroupWrapper group={group}>
+                    {({ setHandleRef, listeners, attributes }) => (
+                      <div className=" py-0.5">
+                        <SidebarGroup
+                          group={group}
+                          dragHandleProps={{
+                            setHandleRef,
+                            listeners,
+                            attributes,
+                          }}
+                          isDragging={group.id === activeGroupId}
+                          isActive={current?.groupId === group.id}
+                        />
+                      </div>
+                    )}
+                  </SortableGroupWrapper>
+
+                  {isOver && !placeIndicatorAbove && <DropIndicator />}
+                </React.Fragment>
+              );
+            })}
+          </SortableContext>
+        </DndContext>
       </div>
-      <SidebarWorkspaceOption pdf={pdf} />
     </div>
-  );
-};
-
-const SidebarWorkspaceOption = ({ pdf }: { pdf: PdfItem }) => {
-  const handleDelete = () => {
-    console.log("Delete PDF", pdf.id);
-  };
-
-  const handleCopy = () => {
-    console.log("Copy config", pdf.config);
-  };
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button className="p-1 text-gray-500 hover:text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity">
-          <EllipsisVertical className="w-4 h-4" />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-white text-gray-900 shadow-md">
-        <DropdownMenuItem onClick={handleCopy}>Copy Config</DropdownMenuItem>
-        <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 };

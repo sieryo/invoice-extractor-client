@@ -50,6 +50,5 @@ export type Sections = {
 };
 
 export type PdfConfig = {
-  fileName: string;
   sections: Sections;
 };

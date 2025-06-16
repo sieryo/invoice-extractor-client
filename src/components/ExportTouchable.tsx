@@ -10,10 +10,10 @@ export const ExportTouchable = ({
   onBeforeExport?: () => void;
   onAfterExport?: () => void;
 }) => {
-  const { pdfs, exportedName } = usePdfStore();
+  const { groups } = usePdfStore();
 
   const exportToExcel = () => {
-    handleExport(pdfs, exportedName, onBeforeExport, onAfterExport);
+    handleExport(groups, onBeforeExport, onAfterExport);
   };
 
   return (

@@ -5,7 +5,7 @@ import { Switch } from "./ui/switch";
 import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 
 export const TableForm = ({}: {}) => {
-  const { config, updateConfig, id } = useCurrentPdf();
+  const { group, updateConfig } = useCurrentPdf();
   const [isHasColumnIndex, setIsHasColumnIndex] = useState(false);
   const targetField: TableField = {
     name: "no",
@@ -21,10 +21,10 @@ export const TableForm = ({}: {}) => {
     console.log(exists);
 
     setIsHasColumnIndex(exists);
-  }, [config]);
+  }, [group]);
 
-  if (!config || !id) return null;
-  const tableConfig = config.sections.table;
+  if (!group) return null;
+  const tableConfig = group.config.sections.table;
 
   const handleChecked = (checked: boolean) => {
     const exists = tableConfig.tableHeader.some(
@@ -43,11 +43,11 @@ export const TableForm = ({}: {}) => {
       newTableHeader = tableConfig.tableHeader;
     }
 
-    const newConfig = config;
-    config.sections.table.tableHeader = newTableHeader;
+    const newConfig = group.config;
+    newConfig.sections.table.tableHeader = newTableHeader;
 
     setIsHasColumnIndex(checked);
-    updateConfig(id, newConfig);
+    updateConfig(group.id, newConfig);
   };
 
   return (

@@ -24,7 +24,7 @@ export class PdfConfigManager {
     };
   }
 
-  static generate(fileName: string): PdfConfig {
+  static generate(): PdfConfig {
     const fields: FieldPdfConfig[] = [
       {
         name: "invoice_number",
@@ -96,7 +96,6 @@ export class PdfConfigManager {
     ];
 
     const config: PdfConfig = {
-      fileName: fileName,
       sections: {
         header: {
           fields,

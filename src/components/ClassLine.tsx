@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { usePdfStore } from "@/store/usePdfStore";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import {
@@ -27,7 +26,7 @@ export const ClassLine = ({
 }) => {
   const [lines, setLines] = useState<number[]>([0, 0]);
   const [error, setError] = useState<string | null>(null);
-  const { config, file, id, updateConfig } = useCurrentPdf();
+  const { group, updateConfig } = useCurrentPdf();
 
   useEffect(() => {
     const initialData = Array.isArray(field.classified.data)
@@ -43,7 +42,9 @@ export const ClassLine = ({
     setLines(updatedLines);
   };
 
-  if (!config || !file || !id) return null;
+  if (!group) return null;
+
+  const config = group.config;
 
   const handleUpdate = () => {
     if (lines[1] <= lines[0]) {
@@ -65,7 +66,7 @@ export const ClassLine = ({
     if (index !== -1) {
       const newConfig = config;
       newConfig.sections.header.fields[index] = updatedField;
-      updateConfig(id, newConfig);
+      updateConfig(group.id, newConfig);
     }
 
     successMessage();

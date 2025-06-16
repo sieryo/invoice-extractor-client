@@ -10,31 +10,36 @@ import { ZoomIn, ZoomOut } from "lucide-react";
 
 import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 import { PdfDocumentLoading } from "./PdfDocumentLoading";
-import { PdfListSheetTrigger } from "./PdfListSheetTrigger";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 export const PDFAnnotator = () => {
-  const { file, height, width, id, updateDimensions, exportedName } =
-    useCurrentPdf();
+  const { file, id, updateDimensions, group } = useCurrentPdf();
 
+  // const [numPages, setNumPages] = useState<number | null>(null);
+  const [scale, setScale] = useState(1);
 
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [scale, setScale] = useState(1.3);
+  if (!id || !file || !group) return (
+    <div className=" w-full flex items-center justify-center h-full  p-12">
+      <div className=" w-[60%] h-full border border-gray-300 flex items-center justify-center">
+        <p>File not selected</p>
+      </div>
+    </div>
+  )
 
-  if (!id || !file) return null;
+  const width = group.width;
+  const height = group.height;
+
 
   const handleLoadSuccess = async (pdf: pdfjs.PDFDocumentProxy) => {
     try {
-      setNumPages(pdf.numPages);
+      // setNumPages(pdf.numPages);
       const page = await pdf.getPage(1);
       const viewport = page.getViewport({ scale: 1 });
 
-      console.log(viewport.width)
-      console.log(viewport.height)
 
 
-      updateDimensions(id, { width: viewport.width, height: viewport.height });
+      updateDimensions(group.id, { width: viewport.width, height: viewport.height });
     } catch (err) {
       console.error(err);
     } finally {
@@ -42,13 +47,11 @@ export const PDFAnnotator = () => {
     }
   };
 
-
   return (
     <div
       className="items-center  relative"
       style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
     >
-     
       {/* <div className=" absolute left-0 top-[8px]">
         <PdfListSheetTrigger />
       </div> */}

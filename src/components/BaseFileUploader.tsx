@@ -1,34 +1,27 @@
-import { usePdfStore } from "@/store/usePdfStore";
+import { usePdfStore, type PdfItem } from "@/store/usePdfStore";
 import { Input } from "./ui/input";
-import { PdfConfigManager } from "@/managers/PdfConfigManager";
-import { successMessage } from "@/lib/helper";
+import { failedMessage, successMessage } from "@/lib/helper";
 
-export const BaseFileUploader = ({ onSuccessUpload }: { onSuccessUpload?: () => void }) => {
-  const { addPdf } = usePdfStore();
+export const BaseFileUploader = ({
+  onSuccessUpload,
+}: {
+  onSuccessUpload?: () => void;
+}) => {
+  const { addGroupOrPdfs } = usePdfStore();
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    let uploadedCount = 0;
-
-    Array.from(files).forEach((file) => {
-      if (file.type === "application/pdf") {
-        const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-        const config = PdfConfigManager.generate(fileNameWithoutExt);
-        addPdf(file, config);
-        uploadedCount++;
-      }
-    });
-
-    if (uploadedCount > 0) {
-      successMessage(`Upload ${uploadedCount} file(s) success`);
+    const arrayFiles = Array.from(files);
+    try {
+      addGroupOrPdfs(arrayFiles);
+      successMessage(`Upload ${arrayFiles.length} file(s) success`);
       onSuccessUpload?.();
-    } else {
-      alert("Please upload PDF file(s) only");
+    } catch (err) {
+      failedMessage("Error uploading file");
     }
 
-    // Reset input agar bisa upload file yang sama lagi
     e.target.value = "";
   };
 

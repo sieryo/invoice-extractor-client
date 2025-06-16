@@ -26,9 +26,7 @@ export const DrawArea = ({
   const [boxes, setBoxes] = useState<BoxState[]>([]);
   const { field, setMode } = useModeStore();
 
-  const { id, config: curConfig, updateConfig } = useCurrentPdf();
-
-  const config = pdf ? pdf.config : curConfig;
+  const { group, id, updateConfig } = useCurrentPdf();
 
   useEffect(() => {
     if (!field) {
@@ -37,7 +35,9 @@ export const DrawArea = ({
       setBoxes([]);
     }
 
-    if (!config) return;
+    if (!group) return;
+
+    const config = group.config;
 
     const configBox = config.sections.header.fields.find(
       (v) => v.classified.method == ClassifiedTypeEnum.BOX
@@ -56,9 +56,11 @@ export const DrawArea = ({
       };
       setBoxes([box]);
     }
-  }, [field, id, config]);
+  }, [field, group]);
 
-  if (!config || !id) return null;
+  if (!group) return null;
+
+  const config = group.config;
 
   const handleUpdate = () => {
     if (!currentBox || !field) return;
@@ -83,11 +85,11 @@ export const DrawArea = ({
     if (index !== -1) {
       const newConfig = config;
       newConfig.sections.header.fields[index] = updatedField;
-      updateConfig(id, newConfig);
+      updateConfig(group.id, newConfig);
     }
     successMessage("Area Updated!");
     setBoxes([currentBox]);
-    console.log(currentBox)
+    console.log(currentBox);
   };
 
   const isDrawingMode = field?.classified.method === ClassifiedTypeEnum.BOX;
