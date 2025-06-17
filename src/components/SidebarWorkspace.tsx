@@ -1,4 +1,3 @@
-import { Plus } from "lucide-react";
 import { usePdfStore } from "@/store/usePdfStore";
 import {
   DndContext,
@@ -18,10 +17,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import React, { useState } from "react";
-import { BaseFileUploader } from "./BaseFileUploader";
 import { DropIndicator } from "./DropIndicator";
 import { SidebarGroup } from "./sidebar/SidebarGroup";
 import { SortableGroupWrapper } from "./SortableGroupWrapper";
+import { AddGroup } from "./AddGroup";
 
 export const SidebarWorkspace = () => {
   const { groups, current, setGroups, getGroup, setPdfs, setCurrent } =
@@ -29,18 +28,18 @@ export const SidebarWorkspace = () => {
   const [active, setActive] = useState<Active | null>(null);
   const [over, setOver] = useState<Over | null>(null);
 
+  const [selectedGroupId, setSelectedGroupId] = useState("")
+
   const sensors = useSensors(useSensor(PointerSensor));
 
   const handleGroupDragStart = (event: DragStartEvent) => {
     const { active } = event;
-
 
     setActive(active);
   };
 
   const handleGroupDragOver = (event: DragOverEvent) => {
     const { over } = event;
-
 
     setOver(over);
   };
@@ -82,7 +81,7 @@ export const SidebarWorkspace = () => {
         newToPdfs.splice(targetIndex + 1, 0, pdfToMove);
         setPdfs(fromGroupId, newFromPdfs);
         setPdfs(toGroupId, newToPdfs);
-        
+
         setCurrent(pdfId, toGroupId);
       } else {
         const oldIndex = fromGroup.pdfs.findIndex((p) => p.id === pdfId);
@@ -129,15 +128,20 @@ export const SidebarWorkspace = () => {
   const getIndex = (id: string | null) => groups.findIndex((g) => g.id === id);
 
   return (
-    <div className="bg-white text-gray-900  h-full flex flex-col  ">
+    <div className="bg-white text-gray-900  h-full flex flex-col px-2  ">
       <div className=" flex justify-between items-center px-4 py-2  ">
         <div className=" text-lg font-semibold">Groups</div>
-        <div className=" relative">
-          <BaseFileUploader />
-          <Plus className=" w-6 h-6 text-gray-800" />
+        <div className=" relative flex gap-2">
+          {/* <div>
+            <BaseFileUploader />
+            <Plus className=" w-6 h-6 text-gray-800" />
+          </div> */}
+          <div>
+            <AddGroup />
+          </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-10 ">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-10 mt-3">
         <DndContext
           collisionDetection={pointerWithin}
           onDragStart={handleGroupDragStart}
@@ -149,7 +153,7 @@ export const SidebarWorkspace = () => {
             items={groups.map((g) => g.id)}
             strategy={verticalListSortingStrategy}
           >
-            {groups.map((group) => {
+            {groups.map((group, idx) => {
               const activeId = active ? active.id : "";
               const overId = over ? over.id : "";
 
@@ -185,11 +189,14 @@ export const SidebarWorkspace = () => {
                       <div>
                         <SidebarGroup
                           group={group}
+                          order={idx + 1}
                           dragHandleProps={{
                             setHandleRef,
                             listeners,
                             attributes,
                           }}
+                          selected={selectedGroupId == group.id}
+                          setSelected={setSelectedGroupId}
                           isDragging={group.id === activeId}
                           isActive={current?.groupId === group.id}
                           dropIndicator={{

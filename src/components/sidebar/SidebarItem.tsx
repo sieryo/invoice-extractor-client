@@ -9,9 +9,12 @@ import { successMessage } from "@/lib/helper";
 export const SidebarItems = ({
   pdf,
   groupId,
+  setGroupSelected,
 }: {
   pdf: PdfItem;
   groupId: string;
+  groupSelected: boolean;
+  setGroupSelected: (val: string) => void;
 }) => {
   const { current, setCurrent, getGroup, setPdfs } = usePdfStore();
   const { setField } = useModeStore();
@@ -27,6 +30,7 @@ export const SidebarItems = ({
   });
 
   const handleClickItem = () => {
+    setGroupSelected("");
     setCurrent(pdf.id, groupId);
     setField(null);
   };
@@ -55,16 +59,16 @@ export const SidebarItems = ({
   ];
 
   return (
-    <div className=" py-0.5">
+    <div className=" my-1">
       <div
         ref={setNodeRef}
         onMouseDown={handleClickItem}
         className={cn(
-          "flex items-center justify-between pl-11 pr-1 py-1.5 group cursor-default transition-colors duration-150",
-          isActive ? "bg-gray-300" : "hover:bg-gray-100"
+          "flex items-center justify-between pl-8 pr-1 py-1.5 rounded-sm group cursor-default",
+          isActive ? "bg-slate-300" : "hover:bg-slate-300"
         )}
       >
-        <div {...listeners} {...attributes}>
+        <div {...listeners} {...attributes} className=" flex-1">
           <div className="flex items-center gap-2 w-full">
             <div
               ref={setNodeRef}
@@ -74,14 +78,14 @@ export const SidebarItems = ({
               <GripIcon
                 className={cn(
                   "w-4 h-4 text-gray-400",
-                  isActive && "text-gray-700"
+                  isActive && "text-blue-500"
                 )}
               />
             </div>
 
             <span
               className={cn(
-                "text-xs truncate flex-1 font-semibold select-none",
+                "text-xs truncate flex-1 font-semibold select-none ",
                 isActive ? "text-gray-900" : "text-gray-700"
               )}
             >
@@ -89,7 +93,7 @@ export const SidebarItems = ({
             </span>
           </div>
         </div>
-        <div className="ml-auto">
+        <div className=" ">
           <SidebarOptions options={option} />
         </div>
       </div>

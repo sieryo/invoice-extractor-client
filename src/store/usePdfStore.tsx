@@ -25,8 +25,10 @@ export type PdfGroup = {
 type PdfStore = {
   groups: PdfGroup[];
   setGroups: (groups: PdfGroup[] | ((prev: PdfGroup[]) => PdfGroup[])) => void;
-  addGroupOrPdfs: (files: any[], config?: PdfConfig) => void;
+  addEmptyGroup: (identifier: string) => void;
+  addGroupOrPdfs: (files: any[], groupId?: string, config?: PdfConfig) => void;
   getGroup: (groupId: string) => PdfGroup | undefined;
+  renameGroupIdentifier(groupId: string, newIdentifier: string): void;
   movePdfToGroup: (
     fromGroupId: string,
     toGroupId: string,
@@ -77,8 +79,34 @@ export const usePdfStore = create<PdfStore>((set, get) => ({
     const { groups } = get();
     return groups.find((p) => p.id === groupId);
   },
+  renameGroupIdentifier: (groupId, newIdentifier) => {
+    set((state) => {
+      const groups = state.groups.map((group) =>
+        group.id === groupId ? { ...group, identifier: newIdentifier } : group
+      );
+      return { groups };
+    });
+  },
+  addEmptyGroup: (identifier) => {
+    set((state) => {
+      const groups = [...state.groups];
 
-  addGroupOrPdfs: (files, config) => {
+      const newGroup = {
+        id: uuidv4(),
+        identifier,
+        pdfs: [],
+        config: PdfConfigManager.generate(),
+        width: DEFAULT_PDF_VIEWER_WIDTH,
+        height: DEFAULT_PDF_VIEWER_HEIGHT,
+      };
+
+      groups.unshift(newGroup);
+
+      return { groups };
+    });
+  },
+
+  addGroupOrPdfs: (files, groupId, config) => {
     set((state) => {
       const groups = [...state.groups];
       let latestCurrent = null;
@@ -86,14 +114,18 @@ export const usePdfStore = create<PdfStore>((set, get) => ({
       files.forEach((file) => {
         const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
         const identifier =
-          extractIdentifier(fileNameWithoutExt) != ""
+          extractIdentifier(fileNameWithoutExt) !== ""
             ? extractIdentifier(fileNameWithoutExt)
             : "uncategorized";
-        const existingGroup = groups.find((g) =>
-          g.identifier.toLowerCase().includes(identifier)
-        );
+
+        const existingGroup = groupId
+          ? groups.find((g) => g.id === groupId)
+          : groups.find((g) =>
+              g.identifier.toLowerCase().includes(identifier.toLowerCase())
+            );
 
         const pdfId = uuidv4();
+
         if (existingGroup) {
           existingGroup.pdfs.push({
             id: pdfId,
@@ -106,9 +138,9 @@ export const usePdfStore = create<PdfStore>((set, get) => ({
             pdfId,
           };
         } else {
-          const groupId = uuidv4();
+          const newGroupId = uuidv4();
           groups.push({
-            id: groupId,
+            id: newGroupId,
             identifier,
             pdfs: [{ id: pdfId, file: file, fileName: fileNameWithoutExt }],
             config: config || PdfConfigManager.generate(),
@@ -117,7 +149,7 @@ export const usePdfStore = create<PdfStore>((set, get) => ({
           });
 
           latestCurrent = {
-            groupId,
+            groupId: newGroupId,
             pdfId,
           };
         }
