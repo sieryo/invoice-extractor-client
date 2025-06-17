@@ -55,67 +55,6 @@ export const SidebarGroup = ({
   const [collapsed, setCollapsed] = useState(false);
   const { sections, setSections } = useCopyConfigStore();
 
-  const [activeItemId, setActiveItemId] = useState<string | null>(null);
-  const [overId, setOverId] = useState<string | null>(null);
-
-  const sensors = useSensors(useSensor(PointerSensor));
-
-  const handleItemDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    setActiveItemId(active.id as string);
-  };
-
-  const handleItemDragOver = (event: DragOverEvent) => {
-    setOverId(event.over?.id.toString() ?? null);
-  };
-
-  const handleDragOver = (event: DragOverEvent) => {
-    const { active, over } = event;
-
-    if (!over) return;
-
-    const activeType = active.data.current?.type;
-    const overType = over.data.current?.type;
-
-    console.log(activeType);
-    console.log(overType);
-
-    if (activeType === "pdf" && overType === "group") {
-      const fromGroupId = active.data.current?.groupId;
-      const toGroupId = over.id as string;
-
-      if (fromGroupId === toGroupId) return;
-
-      const pdf = active.data.current?.pdf;
-      if (!pdf) return;
-
-      const fromGroup = getGroup(fromGroupId);
-      const toGroup = getGroup(toGroupId);
-
-      if (!fromGroup || !toGroup) return;
-
-      // setPdfs(
-      //   fromGroupId,
-      //   fromGroup.pdfs.filter((p) => p.id !== pdf.id)
-      // );
-      // setPdfs(toGroupId, [...toGroup.pdfs, pdf]);
-    }
-  };
-
-  const handleItemDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveItemId(null);
-    setOverId(null);
-
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = group.pdfs.findIndex((g) => g.id === active.id);
-    const newIndex = group.pdfs.findIndex((g) => g.id === over.id);
-    const newPdfs = arrayMove(group.pdfs, oldIndex, newIndex);
-
-    setPdfs(group.id, newPdfs);
-  };
-
   const handleCopyConfig = () => {
     const clonedSections = structuredClone(group.config.sections);
 
@@ -231,9 +170,14 @@ export const SidebarGroup = ({
         >
           {group.pdfs.map((pdf) => {
             const isOver = pdf.id === overFileId && activeFileId !== overFileId;
+
             const activeIndex = getIndex(activeFileId);
             const overIndex = getIndex(overFileId);
             const placeIndicatorAbove = activeIndex > overIndex;
+
+            const isShowItemDropIndicator =
+              dropIndicator.activeType == "file" &&
+              dropIndicator.overType == "file";
 
             // const isOver = overId === pdf.id && activeItemId !== overId;
             // const activeIndex = getIndex(activeItemId);
@@ -243,21 +187,15 @@ export const SidebarGroup = ({
             return (
               <div key={pdf.id}>
                 <div className=" pl-8">
-                  {isOver &&
-                    placeIndicatorAbove &&
-                    dropIndicator.activeType == "file" &&
-                    dropIndicator.overType == "file" && <DropIndicator />}
+                  {isOver && placeIndicatorAbove && isShowItemDropIndicator && (
+                    <DropIndicator />
+                  )}
                 </div>
-                <SidebarItems
-                  pdf={pdf}
-                  groupId={group.id}
-                  isDragging={activeItemId == pdf.id}
-                />
+                <SidebarItems pdf={pdf} groupId={group.id} />
                 <div className=" pl-8">
                   {isOver &&
                     !placeIndicatorAbove &&
-                    dropIndicator.activeType == "file" &&
-                    dropIndicator.overType == "file" && <DropIndicator />}
+                    isShowItemDropIndicator && <DropIndicator />}
                 </div>
               </div>
             );

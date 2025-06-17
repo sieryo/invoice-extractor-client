@@ -46,20 +46,20 @@ function RouteComponent() {
           direction="horizontal"
           className="min-h-[200px]  rounded-lg border gap-3"
         >
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={20}>
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
             <div className=" flex flex-col h-full ">
               <SidebarWorkspace />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
 
-          <ResizablePanel defaultSize={50}>
+          <ResizablePanel defaultSize={70}>
             <div className=" flex- flex-col h-full">
               <PDFAnnotator />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={20} maxSize={25} minSize={20}>
+          <ResizablePanel defaultSize={25} maxSize={25} minSize={22}>
             {/* <FileUploader /> */}
             {file ? (
               <div className="flex flex-col h-full z-50 bg-white">

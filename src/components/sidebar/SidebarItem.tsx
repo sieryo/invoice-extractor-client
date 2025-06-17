@@ -3,21 +3,20 @@ import { usePdfStore, type PdfItem } from "@/store/usePdfStore";
 import { useSortable } from "@dnd-kit/sortable";
 import { SidebarOptions, type SidebarOptionsProps } from "./SidebarOptions";
 import { cn } from "@/lib/utils";
-import { File, GripIcon } from "lucide-react";
+import { GripIcon } from "lucide-react";
 import { successMessage } from "@/lib/helper";
 
 export const SidebarItems = ({
   pdf,
   groupId,
-  isDragging,
 }: {
   pdf: PdfItem;
   groupId: string;
-  isDragging: boolean;
 }) => {
   const { current, setCurrent, getGroup, setPdfs } = usePdfStore();
   const { setField } = useModeStore();
 
+  const isActive = current?.pdfId === pdf.id;
   const { attributes, listeners, setNodeRef } = useSortable({
     id: pdf.id,
     data: {
@@ -27,7 +26,6 @@ export const SidebarItems = ({
     },
   });
 
-  const isActive = current?.pdfId === pdf.id;
 
   const handleClickItem = () => {
     setCurrent(pdf.id, groupId);
@@ -56,20 +54,18 @@ export const SidebarItems = ({
   ];
 
   return (
-    <div ref={setNodeRef} onClick={handleClickItem} className=" py-0.5">
+    <div ref={setNodeRef} onMouseDown={handleClickItem} className=" py-0.5">
       <div
         className={cn(
           "flex items-center justify-between pl-11 pr-1 py-1.5 group cursor-default transition-colors duration-150",
           isActive ? "bg-gray-300" : "hover:bg-gray-100",
-          isDragging && "opacity-30"
         )}
+        {...listeners}
+        {...attributes}
       >
         <div className="flex items-center gap-2 w-full">
           <div
             ref={setNodeRef}
-            {...listeners}
-            {...attributes}
-            onClick={(e) => e.stopPropagation()}
             className=" p-1 rounded cursor-default "
             title="Drag to reorder"
           >

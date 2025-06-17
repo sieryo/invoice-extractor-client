@@ -37,11 +37,13 @@ export const SidebarWorkspace = () => {
   const handleGroupDragStart = (event: DragStartEvent) => {
     const { active } = event;
 
+
     setActive(active);
   };
 
   const handleGroupDragOver = (event: DragOverEvent) => {
     const { over } = event;
+
 
     setOver(over);
   };
@@ -135,7 +137,7 @@ export const SidebarWorkspace = () => {
         <div className=" text-lg font-semibold">Groups</div>
         <div className=" relative">
           <BaseFileUploader />
-          <Plus className=" w-4 h-4 text-gray-800" />
+          <Plus className=" w-6 h-6 text-gray-800" />
         </div>
         <div>
           <ExportTouchable
@@ -181,9 +183,6 @@ export const SidebarWorkspace = () => {
               // Menyalakan Drop indicator bawah folder
               if (activeData?.type == "file" && overData?.type == "group") {
                 isOver = overId === group.id && activeData.groupId !== overId;
-                if (isOver) {
-                  console.log("FILE TO GROUP LAIN");
-                }
               } else if (activeType == "group" && overType == "group") {
                 isOver = overId === group.id && activeId !== overId;
                 const activeIndex = getIndex(activeId.toString());

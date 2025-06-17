@@ -85,9 +85,12 @@ export const usePdfStore = create<PdfStore>((set, get) => ({
 
       files.forEach((file) => {
         const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-        const identifier = extractIdentifier(fileNameWithoutExt);
-        const existingGroup = groups.find(
-          (g) => g.identifier.toLowerCase().includes(identifier)
+        const identifier =
+          extractIdentifier(fileNameWithoutExt) != ""
+            ? extractIdentifier(fileNameWithoutExt)
+            : "uncategorized";
+        const existingGroup = groups.find((g) =>
+          g.identifier.toLowerCase().includes(identifier)
         );
 
         const pdfId = uuidv4();

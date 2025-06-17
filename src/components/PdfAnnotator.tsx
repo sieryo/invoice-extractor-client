@@ -1,5 +1,5 @@
 import { Document, Page, pdfjs } from "react-pdf";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 
@@ -18,6 +18,10 @@ export const PDFAnnotator = () => {
 
   // const [numPages, setNumPages] = useState<number | null>(null);
   const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    setScale(1)
+  }, [id])
 
   if (!id || !file || !group) return (
     <div className=" w-full flex items-center justify-center h-full  p-12">
@@ -55,6 +59,14 @@ export const PDFAnnotator = () => {
       {/* <div className=" absolute left-0 top-[8px]">
         <PdfListSheetTrigger />
       </div> */}
+      <div className=" absolute top-4 left-0 ">
+        <div>
+          <p>Pdf width: {width}px</p>
+        </div>
+         <div>
+          <p>Pdf height: {height}px</p>
+        </div>
+      </div>
       <div className="flex gap-2 p-1.5 items-center   w-full ">
         <div className=" w-full justify-center gap-3 flex ">
           <Button onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>
