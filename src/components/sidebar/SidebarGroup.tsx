@@ -4,17 +4,6 @@ import { ChevronDown, ChevronUp, Folder } from "lucide-react";
 import { SidebarOptions, type SidebarOptionsProps } from "./SidebarOptions";
 import { useState } from "react";
 import {
-  closestCenter,
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  type DragOverEvent,
-  type DragStartEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -50,7 +39,7 @@ export const SidebarGroup = ({
   activeFileId: string | null;
   overFileId: string | null;
 }) => {
-  const { updateConfig, groups, setGroups, setPdfs, getGroup } = usePdfStore();
+  const { updateConfig, groups, setGroups } = usePdfStore();
 
   const [collapsed, setCollapsed] = useState(false);
   const { sections, setSections } = useCopyConfigStore();

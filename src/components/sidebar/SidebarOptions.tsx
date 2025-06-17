@@ -21,7 +21,6 @@ export const SidebarOptions = ({
   isActive?: boolean;
   options: SidebarOptionsProps[];
 }) => {
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

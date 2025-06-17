@@ -1,4 +1,4 @@
-import { usePdfStore, type PdfItem } from "@/store/usePdfStore";
+import { usePdfStore } from "@/store/usePdfStore";
 import { Input } from "./ui/input";
 import { failedMessage, successMessage } from "@/lib/helper";
 

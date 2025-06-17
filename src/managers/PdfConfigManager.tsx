@@ -7,22 +7,6 @@ import {
 } from "@/models/pdfConfig"; // sesuaikan dengan path kamu
 
 export class PdfConfigManager {
-  private config: PdfConfig;
-
-  constructor(exportedName: string) {
-    this.config = {
-      fileName: exportedName,
-      sections: {
-        header: {
-          fields: [],
-        },
-        table: {
-          tableHeader: [],
-          extractFields: [],
-        },
-      },
-    };
-  }
 
   static generate(): PdfConfig {
     const fields: FieldPdfConfig[] = [

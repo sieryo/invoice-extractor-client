@@ -22,7 +22,6 @@ export const useModeStore = create<ActiveFieldBoxStore>((set, get) => ({
   mode: EditorMode.Cursor,
 
   setField: (field) => {
-    console.log(`Actived field: ${field}`);
     set({ field });
   },
 

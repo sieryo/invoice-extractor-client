@@ -1,7 +1,6 @@
 import { PDFAnnotator } from "@/components/PdfAnnotator";
-import { Button } from "@/components/ui/button";
 import { ClassifiedTypeEnum } from "@/models/pdfConfig";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Brackets, ScanText, Type } from "lucide-react";
 import { HeaderField } from "@/components/HeaderField";
 import { TableFieldForm } from "@/components/TableFieldForm";
@@ -13,17 +12,15 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { UploadPage } from "@/components/UploadPage";
 import { ModeBanner } from "@/components/ModeBanner";
 import { SidebarWorkspace } from "@/components/SidebarWorkspace";
-import FileUploader from "@/components/FileUploader";
 
 export const Route = createFileRoute("/workspace")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { pdf, group, file } = useCurrentPdf();
+  const { group, file } = useCurrentPdf();
 
   // useEffect(() => {
   //   const handleBeforeUnload = (e: any) => {
@@ -44,7 +41,7 @@ function RouteComponent() {
       <div className=" w-full h-full flex">
         <ResizablePanelGroup
           direction="horizontal"
-          className="min-h-[200px]  rounded-lg border gap-3"
+          className="min-h-[200px]  rounded-lg border"
         >
           <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
             <div className=" flex flex-col h-full ">
@@ -53,7 +50,7 @@ function RouteComponent() {
           </ResizablePanel>
           <ResizableHandle withHandle />
 
-          <ResizablePanel defaultSize={70}>
+          <ResizablePanel defaultSize={50}>
             <div className=" flex- flex-col h-full">
               <PDFAnnotator />
             </div>

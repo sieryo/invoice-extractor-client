@@ -1,8 +1,7 @@
-import { X } from "lucide-react";
 import { EditorMode, useModeStore } from "@/store/useModeStore";
 
 export const ModeBanner = () => {
-  const { setMode, getCurrentMode } = useModeStore();
+  const { getCurrentMode } = useModeStore();
 
   const title =
     getCurrentMode() == EditorMode.DrawBox

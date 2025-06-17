@@ -26,7 +26,6 @@ export const SidebarItems = ({
     },
   });
 
-
   const handleClickItem = () => {
     setCurrent(pdf.id, groupId);
     setField(null);
@@ -34,6 +33,8 @@ export const SidebarItems = ({
 
   const handleDeleteFile = () => {
     const currentGroup = getGroup(groupId);
+
+    console.log("here!");
 
     if (!currentGroup) return;
 
@@ -54,41 +55,42 @@ export const SidebarItems = ({
   ];
 
   return (
-    <div ref={setNodeRef} onMouseDown={handleClickItem} className=" py-0.5">
+    <div className=" py-0.5">
       <div
+        ref={setNodeRef}
+        onMouseDown={handleClickItem}
         className={cn(
           "flex items-center justify-between pl-11 pr-1 py-1.5 group cursor-default transition-colors duration-150",
-          isActive ? "bg-gray-300" : "hover:bg-gray-100",
+          isActive ? "bg-gray-300" : "hover:bg-gray-100"
         )}
-        {...listeners}
-        {...attributes}
       >
-        <div className="flex items-center gap-2 w-full">
-          <div
-            ref={setNodeRef}
-            className=" p-1 rounded cursor-default "
-            title="Drag to reorder"
-          >
-            <GripIcon
+        <div {...listeners} {...attributes}>
+          <div className="flex items-center gap-2 w-full">
+            <div
+              ref={setNodeRef}
+              className=" p-1 rounded cursor-default "
+              title="Drag to reorder"
+            >
+              <GripIcon
+                className={cn(
+                  "w-4 h-4 text-gray-400",
+                  isActive && "text-gray-700"
+                )}
+              />
+            </div>
+
+            <span
               className={cn(
-                "w-4 h-4 text-gray-400",
-                isActive && "text-gray-700"
+                "text-xs truncate flex-1 font-semibold select-none",
+                isActive ? "text-gray-900" : "text-gray-700"
               )}
-            />
+            >
+              {pdf.fileName}
+            </span>
           </div>
-
-          <span
-            className={cn(
-              "text-xs truncate flex-1 font-semibold select-none",
-              isActive ? "text-gray-900" : "text-gray-700"
-            )}
-          >
-            {pdf.fileName}
-          </span>
-
-          <div className="ml-auto">
-            <SidebarOptions options={option} />
-          </div>
+        </div>
+        <div className="ml-auto">
+          <SidebarOptions options={option} />
         </div>
       </div>
     </div>

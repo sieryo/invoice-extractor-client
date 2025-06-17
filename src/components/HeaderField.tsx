@@ -2,8 +2,6 @@ import { Label } from "./ui/label";
 import { Pencil } from "lucide-react";
 import { ClassifiedTypeEnum, type FieldPdfConfig } from "@/models/pdfConfig";
 import { mapClassifiedTypeEnum } from "@/lib/helper";
-import { Input } from "./ui/input";
-import { DrawButton } from "./DrawButton";
 import { ClassKeyword } from "./ClassKeyword";
 import { useState } from "react";
 import { ClassLine } from "./ClassLine";
@@ -18,10 +16,8 @@ export const HeaderField = ({
   icon: React.ReactNode;
   description?: string;
 }) => {
-  const classifiedData = field.classified.data;
   const classifiedMethod = field.classified.method;
   const label = field.label;
-  const name = field.name;
   const [isEditing, setIsEditing] = useState(false);
 
   const handleIsEditing = (state: boolean) => {

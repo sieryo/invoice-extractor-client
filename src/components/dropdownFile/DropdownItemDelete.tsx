@@ -1,5 +1,3 @@
-import { usePdfStore } from "@/store/usePdfStore";
-import { DropdownMenuItem } from "../ui/dropdown-menu";
 import {
   Dialog,
   DialogClose,

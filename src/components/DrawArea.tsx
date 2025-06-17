@@ -9,13 +9,12 @@ import {
 import { EditorMode, useModeStore } from "@/store/useModeStore";
 import type { PdfItem } from "@/store/usePdfStore";
 import { useEffect, useState } from "react";
-import { Layer, Rect, Stage, Group, Text } from "react-konva";
+import { Layer, Rect, Stage, Group } from "react-konva";
 
 export const DrawArea = ({
   width,
   height,
   scale,
-  pdf,
 }: {
   width: number;
   height: number;
@@ -26,7 +25,7 @@ export const DrawArea = ({
   const [boxes, setBoxes] = useState<BoxState[]>([]);
   const { field, setMode } = useModeStore();
 
-  const { group, id, updateConfig } = useCurrentPdf();
+  const { group, updateConfig } = useCurrentPdf();
 
   useEffect(() => {
     if (!field) {
@@ -43,9 +42,13 @@ export const DrawArea = ({
       (v) => v.classified.method == ClassifiedTypeEnum.BOX
     );
     if (configBox) {
+      // @ts-expect-error
       const x = configBox.classified.data.x0;
+      // @ts-expect-error
       const y = configBox.classified.data.top;
+      // @ts-expect-error
       const width = configBox.classified.data.x1 - x;
+      // @ts-expect-error
       const height = configBox.classified.data.bottom - y;
       const box: BoxState = {
         x,
@@ -94,7 +97,7 @@ export const DrawArea = ({
 
   const isDrawingMode = field?.classified.method === ClassifiedTypeEnum.BOX;
 
-  const updateBox = (box: BoxState) => {
+  const updateBox = () => {
     const confirm = window.confirm("Confirm this area?");
     if (confirm) {
       handleUpdate();
@@ -130,9 +133,13 @@ export const DrawArea = ({
           boxes.map((box, i) => (
             <Group key={i}>
               <Rect
+      // @ts-expect-error
                 x={box.x}
+      // @ts-expect-error
                 y={box.y}
+      // @ts-expect-error
                 width={box.width}
+      // @ts-expect-error
                 height={box.height}
                 cornerRadius={2}
                 strokeWidth={1}

@@ -21,8 +21,6 @@ import React, { useState } from "react";
 import { BaseFileUploader } from "./BaseFileUploader";
 import { DropIndicator } from "./DropIndicator";
 import { SidebarGroup } from "./sidebar/SidebarGroup";
-import { ExportTouchable } from "./ExportTouchable";
-import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
 import { SortableGroupWrapper } from "./SortableGroupWrapper";
 
 export const SidebarWorkspace = () => {
@@ -30,7 +28,6 @@ export const SidebarWorkspace = () => {
     usePdfStore();
   const [active, setActive] = useState<Active | null>(null);
   const [over, setOver] = useState<Over | null>(null);
-  const { setIsLoading } = useFullScreenLoadingStore();
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -138,22 +135,6 @@ export const SidebarWorkspace = () => {
         <div className=" relative">
           <BaseFileUploader />
           <Plus className=" w-6 h-6 text-gray-800" />
-        </div>
-        <div>
-          <ExportTouchable
-            onBeforeExport={() => {
-              setIsLoading(true);
-            }}
-            onAfterExport={() => {
-              setIsLoading(false);
-            }}
-          >
-            <div className=" h-full  ">
-              <div className=" p-2 px-6 bg-gray-900 text-gray-50 font-semibold rounded-md cursor-pointer ">
-                Export
-              </div>
-            </div>
-          </ExportTouchable>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto overflow-x-hidden pb-10 ">
