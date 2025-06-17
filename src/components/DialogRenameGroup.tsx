@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { usePdfStore } from "@/store/usePdfStore";
 import { successMessage } from "@/lib/helper";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 export const DialogRenameGroup = ({
   isOpen,
@@ -54,6 +55,7 @@ export const DialogRenameGroup = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Group name</DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         <div className="flex flex-row items-center justify-between rounded-lg">
           <Input

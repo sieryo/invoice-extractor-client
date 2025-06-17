@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { DropIndicator } from "../DropIndicator";
 import { BaseFileUploader } from "../BaseFileUploader";
 import { DialogRenameGroup } from "../DialogRenameGroup";
+import { deletePdfFile } from "@/lib/pdfFileStorage";
 
 export type DropType = "file" | "group";
 
@@ -80,7 +81,9 @@ export const SidebarGroup = ({
     updateConfig(group.id, newConfig);
   };
 
-  const handleDeleteGroup = () => {
+  const handleDeleteGroup = async () => {
+    await Promise.all(group.pdfs.map((pdf) => deletePdfFile(pdf.id)));
+
     const newGroups = [...groups].filter((g) => g.id != group.id);
 
     toast.success("Successfully deleted group", {
@@ -131,8 +134,8 @@ export const SidebarGroup = ({
     group.pdfs.findIndex((g) => g.id === id);
 
   const handleSuccessUpload = () => {
-    setCollapsed(false)
-  }
+    setCollapsed(false);
+  };
 
   return (
     <div
@@ -182,7 +185,10 @@ export const SidebarGroup = ({
         </div>
 
         <div className="flex items-center gap-2 relative">
-          <UploadWithGroupId onSuccessUpload={handleSuccessUpload} groupId={group.id} />
+          <UploadWithGroupId
+            onSuccessUpload={handleSuccessUpload}
+            groupId={group.id}
+          />
           <SidebarOptions isActive={true} options={options} />
         </div>
       </div>
@@ -238,7 +244,13 @@ export const SidebarGroup = ({
   );
 };
 
-const UploadWithGroupId = ({ onSuccessUpload, groupId }: { onSuccessUpload?: () => void, groupId: string }) => {
+const UploadWithGroupId = ({
+  onSuccessUpload,
+  groupId,
+}: {
+  onSuccessUpload?: () => void;
+  groupId: string;
+}) => {
   return (
     <div className=" relative">
       <BaseFileUploader onSuccessUpload={onSuccessUpload} groupId={groupId} />

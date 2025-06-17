@@ -9,5 +9,11 @@ export const loadPdfFile = async (pdfId: string): Promise<File | undefined> => {
 };
 
 export const deletePdfFile = async (pdfId: string) => {
-  await del(`pdf-file-${pdfId}`);
+  try {
+    await del(`pdf-file-${pdfId}`);
+
+    console.log("deleted!")
+  } catch (error) {
+    console.error(error)
+  }
 };

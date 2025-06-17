@@ -14,6 +14,9 @@ export const TableForm = ({}: {}) => {
   };
 
   useEffect(() => {
+
+    if (!group) return
+
     const exists = tableConfig.tableHeader.some(
       (field) => field.name === targetField.name
     );

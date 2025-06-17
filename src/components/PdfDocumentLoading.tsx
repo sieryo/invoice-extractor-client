@@ -2,7 +2,7 @@ import { LoaderCircle } from "lucide-react";
 
 export const PdfDocumentLoading = () => {
   return (
-    <div className=" w-full h-full flex items-center justify-center  ">
+    <div className=" w-full h-full absolute flex items-center justify-center  ">
       <LoaderCircle className="h-12 w-12 animate-spin text-gray-800" />
     </div>
   );

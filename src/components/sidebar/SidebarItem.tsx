@@ -5,6 +5,7 @@ import { SidebarOptions, type SidebarOptionsProps } from "./SidebarOptions";
 import { cn } from "@/lib/utils";
 import { GripIcon } from "lucide-react";
 import { successMessage } from "@/lib/helper";
+import { deletePdfFile } from "@/lib/pdfFileStorage";
 
 export const SidebarItems = ({
   pdf,
@@ -35,10 +36,10 @@ export const SidebarItems = ({
     setField(null);
   };
 
-  const handleDeleteFile = () => {
+  const handleDeleteFile = async () => {
     const currentGroup = getGroup(groupId);
 
-    console.log("here!");
+    await deletePdfFile(pdf.id)
 
     if (!currentGroup) return;
 

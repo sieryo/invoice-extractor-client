@@ -26,7 +26,7 @@ export const PDFAnnotator = () => {
 
   const { isReverse, setIsReverse } = useReverseUploadStore();
 
-  if (!id || !file || !group)
+  if (!id || !file || !group || typeof file !== "object")
     return (
       <div className=" w-full flex items-center justify-center h-full  p-12">
         <div className=" w-[60%] h-full border border-gray-300 flex items-center justify-center">
@@ -140,6 +140,7 @@ export const PDFAnnotator = () => {
             }}
           >
             <Document
+              key={file?.name || id}
               onLoadSuccess={handleLoadSuccess}
               loading={<PdfDocumentLoading />}
               file={file}
