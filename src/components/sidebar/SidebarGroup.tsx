@@ -50,7 +50,7 @@ export const SidebarGroup = ({
   const { updateConfig, groups, setGroups, setCurrent, current } =
     usePdfStore();
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const { sections, setSections } = useCopyConfigStore();
 
   const [isDialogRenameOpen, setIsDialogRenameOpen] = useState(false);

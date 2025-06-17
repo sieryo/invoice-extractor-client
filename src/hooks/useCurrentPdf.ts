@@ -16,8 +16,10 @@ export const useCurrentPdf = () => {
 
       try {
         const pdfId = current ? current.pdfId : "";
-        if (!pdfId) return;
-
+        if (!pdfId) {
+          setFile(undefined)
+          return
+        };
         const file = await loadPdfFile(pdfId);
 
         if (!canceled) {

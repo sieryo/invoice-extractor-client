@@ -12,8 +12,8 @@ export const ExportTouchable = ({
 }) => {
   const { groups } = usePdfStore();
 
-  const exportToExcel = () => {
-    handleExport(groups, onBeforeExport, onAfterExport);
+  const exportToExcel = async () => {
+    await handleExport(groups, onBeforeExport, onAfterExport);
   };
 
   return (

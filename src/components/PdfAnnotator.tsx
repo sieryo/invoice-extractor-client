@@ -26,6 +26,7 @@ export const PDFAnnotator = () => {
 
   const { isReverse, setIsReverse } = useReverseUploadStore();
 
+
   if (!id || !file || !group || typeof file !== "object")
     return (
       <div className=" w-full flex items-center justify-center h-full  p-12">
@@ -41,6 +42,8 @@ export const PDFAnnotator = () => {
   const handleLoadSuccess = async (pdf: pdfjs.PDFDocumentProxy) => {
     try {
       // setNumPages(pdf.numPages);
+
+      console.log(pdf)
       const page = await pdf.getPage(1);
       const viewport = page.getViewport({ scale: 1 });
 

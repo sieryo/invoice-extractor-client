@@ -2,6 +2,7 @@ import type { PdfConfig } from "@/models/pdfConfig";
 import { failedMessage } from "./helper";
 import axios from "axios";
 import type { PdfGroup } from "@/store/usePdfStore";
+import { loadPdfFile } from "./pdfFileStorage";
 
 function buildHeaderConfig(config: PdfConfig) {
   return {
@@ -35,21 +36,29 @@ function buildExportConfig(config: PdfConfig) {
   };
 }
 
-function buildFormDataMulti(groups: PdfGroup[]) {
+async function buildFormDataMulti(groups: PdfGroup[]) {
   const formData = new FormData();
 
-  groups.forEach((group) => {
-    group.pdfs.forEach((pdf) => {
-      formData.append("files", pdf.file);
+  for (const group of groups) {
+    for (const pdf of group.pdfs) {
+      const file = await loadPdfFile(pdf.id);
+
+      if (!file) {
+        console.warn(`File for PDF id ${pdf.id} not found`);
+        continue;
+      }
+
+      formData.append("files", file);
       formData.append(
         "configs",
         JSON.stringify(buildExportConfig(group.config))
       );
-    });
-  });
+    }
+  }
 
   return formData;
 }
+
 
 function triggerDownload(response: any) {
   const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -102,7 +111,7 @@ export const handleExport = async (
     onBeforeExport();
   }
 
-  const formData = buildFormDataMulti(groups);
+  const formData = await buildFormDataMulti(groups);
 
 
   try {
