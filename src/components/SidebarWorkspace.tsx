@@ -9,6 +9,8 @@ import {
   type DragStartEvent,
   type DragOverEvent,
   pointerWithin,
+  type Active,
+  type Over,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -24,34 +26,105 @@ import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
 import { SortableGroupWrapper } from "./SortableGroupWrapper";
 
 export const SidebarWorkspace = () => {
-  const { groups, current, setGroups } = usePdfStore();
-  const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
-  const [overId, setOverId] = useState<string | null>(null);
+  const { groups, current, setGroups, getGroup, setPdfs, setCurrent } =
+    usePdfStore();
+  const [active, setActive] = useState<Active | null>(null);
+  const [over, setOver] = useState<Over | null>(null);
   const { setIsLoading } = useFullScreenLoadingStore();
 
   const sensors = useSensors(useSensor(PointerSensor));
 
   const handleGroupDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    // const group = groups.find((g) => g.id === active.id);
-    setActiveGroupId(active.id as string);
+
+    setActive(active);
   };
 
   const handleGroupDragOver = (event: DragOverEvent) => {
-    setOverId(event.over?.id.toString() ?? null);
+    const { over } = event;
+
+    setOver(over);
   };
 
   const handleGroupDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    setActiveGroupId(null);
-    setOverId(null);
+    setActive(null);
+    setOver(null);
 
     if (!over || active.id === over.id) return;
 
-    const oldIndex = groups.findIndex((g) => g.id === active.id);
-    const newIndex = groups.findIndex((g) => g.id === over.id);
-    const newGroups = arrayMove(groups, oldIndex, newIndex);
-    setGroups(newGroups);
+    const overId = over.id;
+
+    const activeData = active.data.current;
+    const overData = over.data.current;
+
+    // Handle file -> file
+    if (activeData?.type === "file" && overData?.type === "file") {
+      const fromGroupId = activeData.groupId;
+      const toGroupId = overData.groupId;
+      const pdfId = activeData.pdfId;
+      const targetPdfId = overData.pdfId;
+
+      const fromGroup = getGroup(fromGroupId);
+      const toGroup = getGroup(toGroupId);
+
+      if (!fromGroup || !toGroup) return;
+
+      const pdfToMove = fromGroup.pdfs.find((p) => p.id === pdfId);
+      if (!pdfToMove) return;
+
+      let newFromPdfs = fromGroup.pdfs.filter((p) => p.id !== pdfId);
+
+      const targetIndex = toGroup.pdfs.findIndex((p) => p.id === targetPdfId);
+
+      let newToPdfs = [...toGroup.pdfs];
+
+      if (fromGroupId !== toGroupId) {
+        newToPdfs.splice(targetIndex + 1, 0, pdfToMove);
+        setPdfs(fromGroupId, newFromPdfs);
+        setPdfs(toGroupId, newToPdfs);
+        
+        setCurrent(pdfId, toGroupId);
+      } else {
+        const oldIndex = fromGroup.pdfs.findIndex((p) => p.id === pdfId);
+        const newIndex = targetIndex;
+
+        const reordered = arrayMove(fromGroup.pdfs, oldIndex, newIndex);
+        setPdfs(fromGroupId, reordered);
+      }
+    }
+
+    // Handle file -> group
+    if (activeData?.type === "file" && overData?.type === "group") {
+      const fromGroupId = activeData.groupId;
+      const pdfId = activeData.pdfId;
+      const toGroupId = overId.toString();
+
+      if (fromGroupId === toGroupId) return;
+
+      const fromGroup = getGroup(fromGroupId);
+      const toGroup = getGroup(toGroupId);
+
+      if (!fromGroup || !toGroup) return;
+
+      const pdfToMove = fromGroup.pdfs.find((p) => p.id === pdfId);
+      if (!pdfToMove) return;
+
+      const newFromPdfs = fromGroup.pdfs.filter((p) => p.id !== pdfId);
+      setPdfs(fromGroupId, newFromPdfs);
+
+      const newToPdfs = [...toGroup.pdfs, pdfToMove];
+      setPdfs(toGroupId, newToPdfs);
+
+      setCurrent(pdfId, toGroupId);
+    }
+    // handle group -> group
+    if (activeData?.type === "group" && overData?.type === "group") {
+      const oldIndex = groups.findIndex((g) => g.id === active.id);
+      const newIndex = groups.findIndex((g) => g.id === over.id);
+      const newGroups = arrayMove(groups, oldIndex, newIndex);
+      setGroups(newGroups);
+    }
   };
 
   const getIndex = (id: string | null) => groups.findIndex((g) => g.id === id);
@@ -94,18 +167,42 @@ export const SidebarWorkspace = () => {
             strategy={verticalListSortingStrategy}
           >
             {groups.map((group) => {
-              const isOver = overId === group.id && activeGroupId !== overId;
-              const activeIndex = getIndex(activeGroupId);
-              const overIndex = getIndex(overId);
-              const placeIndicatorAbove = activeIndex > overIndex;
+              const activeId = active ? active.id : "";
+              const overId = over ? over.id : "";
+
+              const activeData = active?.data.current;
+              const overData = over?.data.current;
+              let activeType = activeData?.type;
+              let overType = overData?.type;
+              let placeIndicatorAbove = false;
+              let isOver = false;
+
+              // (Active type file to group yang berbeda)
+              // Menyalakan Drop indicator bawah folder
+              if (activeData?.type == "file" && overData?.type == "group") {
+                isOver = overId === group.id && activeData.groupId !== overId;
+                if (isOver) {
+                  console.log("FILE TO GROUP LAIN");
+                }
+              } else if (activeType == "group" && overType == "group") {
+                isOver = overId === group.id && activeId !== overId;
+                const activeIndex = getIndex(activeId.toString());
+                const overIndex = getIndex(overId.toString());
+                placeIndicatorAbove = activeIndex > overIndex;
+              }
+
+              const isShowGroupDropIndicator =
+                isOver && activeType == "group" && overType == "group";
 
               return (
                 <React.Fragment key={group.id}>
-                  {isOver && placeIndicatorAbove && <DropIndicator />}
+                  {isShowGroupDropIndicator && placeIndicatorAbove && (
+                    <DropIndicator />
+                  )}
 
                   <SortableGroupWrapper group={group}>
                     {({ setHandleRef, listeners, attributes }) => (
-                      <div className=" py-0.5">
+                      <div>
                         <SidebarGroup
                           group={group}
                           dragHandleProps={{
@@ -113,14 +210,30 @@ export const SidebarWorkspace = () => {
                             listeners,
                             attributes,
                           }}
-                          isDragging={group.id === activeGroupId}
+                          isDragging={group.id === activeId}
                           isActive={current?.groupId === group.id}
+                          dropIndicator={{
+                            isOver: isOver,
+                            placement: placeIndicatorAbove ? "top" : "bottom",
+                            activeType: activeType,
+                            overType: overType,
+                          }}
+                          // @ts-expect-error
+                          activeFileId={
+                            activeData?.type === "file" ? active?.id : null
+                          }
+                          // @ts-expect-error
+                          overFileId={
+                            overData?.type === "file" ? over?.id : null
+                          }
                         />
                       </div>
                     )}
                   </SortableGroupWrapper>
 
-                  {isOver && !placeIndicatorAbove && <DropIndicator />}
+                  {isShowGroupDropIndicator && !placeIndicatorAbove && (
+                    <DropIndicator />
+                  )}
                 </React.Fragment>
               );
             })}

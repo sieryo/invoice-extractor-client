@@ -20,6 +20,9 @@ export const SortableGroupWrapper = ({
     setActivatorNodeRef,
   } = useSortable({
     id: group.id,
+    data: {
+      type: "group"
+    },
     transition: null,
     animateLayoutChanges: () => false,
   });

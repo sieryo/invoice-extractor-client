@@ -23,10 +23,15 @@ import { useCopyConfigStore } from "@/store/useCopyConfigStore";
 import { toast } from "sonner";
 import { DropIndicator } from "../DropIndicator";
 
+export type DropType = "file" | "group";
+
 export const SidebarGroup = ({
   group,
   dragHandleProps,
   isDragging,
+  dropIndicator,
+  activeFileId,
+  overFileId,
 }: {
   group: PdfGroup;
   dragHandleProps: {
@@ -36,8 +41,16 @@ export const SidebarGroup = ({
   };
   isDragging?: boolean;
   isActive?: boolean;
+  dropIndicator: {
+    placement: "top" | "bottom";
+    isOver: boolean;
+    activeType: DropType;
+    overType: DropType;
+  };
+  activeFileId: string | null;
+  overFileId: string | null;
 }) => {
-  const { updateConfig, groups, setGroups, setPdfs } = usePdfStore();
+  const { updateConfig, groups, setGroups, setPdfs, getGroup } = usePdfStore();
 
   const [collapsed, setCollapsed] = useState(false);
   const { sections, setSections } = useCopyConfigStore();
@@ -54,6 +67,39 @@ export const SidebarGroup = ({
 
   const handleItemDragOver = (event: DragOverEvent) => {
     setOverId(event.over?.id.toString() ?? null);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const activeType = active.data.current?.type;
+    const overType = over.data.current?.type;
+
+    console.log(activeType);
+    console.log(overType);
+
+    if (activeType === "pdf" && overType === "group") {
+      const fromGroupId = active.data.current?.groupId;
+      const toGroupId = over.id as string;
+
+      if (fromGroupId === toGroupId) return;
+
+      const pdf = active.data.current?.pdf;
+      if (!pdf) return;
+
+      const fromGroup = getGroup(fromGroupId);
+      const toGroup = getGroup(toGroupId);
+
+      if (!fromGroup || !toGroup) return;
+
+      // setPdfs(
+      //   fromGroupId,
+      //   fromGroup.pdfs.filter((p) => p.id !== pdf.id)
+      // );
+      // setPdfs(toGroupId, [...toGroup.pdfs, pdf]);
+    }
   };
 
   const handleItemDragEnd = (event: DragEndEvent) => {
@@ -94,6 +140,11 @@ export const SidebarGroup = ({
 
   const handleDeleteGroup = () => {
     const newGroups = [...groups].filter((g) => g.id != group.id);
+
+    toast.success("Successfully deleted group", {
+      position: "top-center",
+      richColors: true,
+    });
 
     setGroups(newGroups);
   };
@@ -166,39 +217,52 @@ export const SidebarGroup = ({
         </div>
       </div>
 
+      {dropIndicator.isOver &&
+        dropIndicator.activeType == "file" &&
+        dropIndicator.overType == "group" &&
+        dropIndicator.placement == "bottom" && <DropIndicator />}
+
       {/* Items */}
       {!collapsed && (
-        <DndContext
-          collisionDetection={closestCenter}
-          onDragEnd={handleItemDragEnd}
-          onDragOver={handleItemDragOver}
-          onDragStart={handleItemDragStart}
-          sensors={sensors}
+        <SortableContext
+          items={group.pdfs.map((p) => p.id)}
+          strategy={verticalListSortingStrategy}
+          disabled={dropIndicator.activeType == "group"}
         >
-          <SortableContext
-            items={group.pdfs.map((p) => p.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            {group.pdfs.map((pdf) => {
-              const isOver = overId === pdf.id && activeItemId !== overId;
-              const activeIndex = getIndex(activeItemId);
-              const overIndex = getIndex(overId);
-              const placeIndicatorAbove = activeIndex > overIndex;
+          {group.pdfs.map((pdf) => {
+            const isOver = pdf.id === overFileId && activeFileId !== overFileId;
+            const activeIndex = getIndex(activeFileId);
+            const overIndex = getIndex(overFileId);
+            const placeIndicatorAbove = activeIndex > overIndex;
 
-              return (
-                <div key={pdf.id} className=" py-0.5">
-                  <div className=" pl-8">
-                    {isOver && placeIndicatorAbove && <DropIndicator />}
-                  </div>
-                  <SidebarItems pdf={pdf} groupId={group.id} isDragging={activeItemId == pdf.id} />
-                  <div className=" pl-8">
-                    {isOver && !placeIndicatorAbove && <DropIndicator />}
-                  </div>
+            // const isOver = overId === pdf.id && activeItemId !== overId;
+            // const activeIndex = getIndex(activeItemId);
+            // const overIndex = getIndex(overId);
+            // const placeIndicatorAbove = activeIndex > overIndex;
+
+            return (
+              <div key={pdf.id}>
+                <div className=" pl-8">
+                  {isOver &&
+                    placeIndicatorAbove &&
+                    dropIndicator.activeType == "file" &&
+                    dropIndicator.overType == "file" && <DropIndicator />}
                 </div>
-              );
-            })}
-          </SortableContext>
-        </DndContext>
+                <SidebarItems
+                  pdf={pdf}
+                  groupId={group.id}
+                  isDragging={activeItemId == pdf.id}
+                />
+                <div className=" pl-8">
+                  {isOver &&
+                    !placeIndicatorAbove &&
+                    dropIndicator.activeType == "file" &&
+                    dropIndicator.overType == "file" && <DropIndicator />}
+                </div>
+              </div>
+            );
+          })}
+        </SortableContext>
       )}
     </div>
   );
