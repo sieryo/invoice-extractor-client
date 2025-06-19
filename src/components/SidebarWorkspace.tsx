@@ -23,9 +23,9 @@ import { SortableGroupWrapper } from "./SortableGroupWrapper";
 import { AddGroup } from "./AddGroup";
 import {
   getFolderNameFromPath,
-  successMessage,
   traverseFileTree,
-} from "@/lib/helper";
+} from "@/utils";
+import { successMessage } from "@/utils/message";
 import { X } from "lucide-react";
 import { deletePdfFile } from "@/lib/pdfFileStorage";
 

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import type { FieldPdfConfig } from "@/models/pdfConfig";
 import { PreviewField } from "./PreviewField";
-import { successMessage } from "@/lib/helper";
+import { successMessage } from "@/utils/message";
 import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 
 export const ClassLine = ({

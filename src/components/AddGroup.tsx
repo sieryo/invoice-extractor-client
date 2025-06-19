@@ -10,7 +10,7 @@ import { Button } from "./ui/button";
 import { useState } from "react";
 import { Input } from "./ui/input";
 import { usePdfStore } from "@/store/usePdfStore";
-import { successMessage } from "@/lib/helper";
+import { successMessage } from "@/utils/message";
 
 export const AddGroup = () => {
   const [value, setValue] = useState("");

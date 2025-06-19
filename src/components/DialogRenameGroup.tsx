@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { usePdfStore } from "@/store/usePdfStore";
-import { successMessage } from "@/lib/helper";
+import { successMessage } from "@/utils/message";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 export const DialogRenameGroup = ({

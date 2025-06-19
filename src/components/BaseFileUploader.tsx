@@ -1,6 +1,6 @@
 import { usePdfStore } from "@/store/usePdfStore";
 import { Input } from "./ui/input";
-import { failedMessage, successMessage } from "@/lib/helper";
+import { successMessage, errorMessage } from "@/utils/message";
 import { useReverseUploadStore } from "@/store/useReverseUploadStore";
 
 export const BaseFileUploader = ({
@@ -10,7 +10,7 @@ export const BaseFileUploader = ({
   onSuccessUpload?: () => void;
   groupId?: string;
 }) => {
-  const { addGroupOrPdfs } = usePdfStore();
+  const { addPdfs } = usePdfStore();
   const { isReverse } = useReverseUploadStore();
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,15 +19,15 @@ export const BaseFileUploader = ({
 
     let arrayFiles = Array.from(files);
 
-    if (isReverse) arrayFiles.reverse()
+    if (isReverse) arrayFiles.reverse();
 
     if (groupId)
       try {
-        addGroupOrPdfs(arrayFiles, groupId);
+        addPdfs(arrayFiles, groupId);
         successMessage(`Upload ${arrayFiles.length} file(s) success`);
         onSuccessUpload?.();
       } catch (err) {
-        failedMessage("Error uploading file");
+        errorMessage("Error uploading file");
       }
 
     e.target.value = "";

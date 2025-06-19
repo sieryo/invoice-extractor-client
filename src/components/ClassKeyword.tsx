@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import type { FieldPdfConfig } from "@/models/pdfConfig";
 import { PreviewField } from "./PreviewField";
-import { successMessage } from "@/lib/helper";
+import { successMessage } from "@/utils/message";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
 

@@ -1,11 +1,11 @@
 import { Label } from "./ui/label";
 import { Pencil } from "lucide-react";
 import { ClassifiedTypeEnum, type FieldPdfConfig } from "@/models/pdfConfig";
-import { mapClassifiedTypeEnum } from "@/lib/helper";
 import { ClassKeyword } from "./ClassKeyword";
 import { useState } from "react";
 import { ClassLine } from "./ClassLine";
 import { ClassBoxArea } from "./ClassBoxArea";
+import { mapClassifiedTypeEnum } from "@/utils";
 
 export const HeaderField = ({
   field,

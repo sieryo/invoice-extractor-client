@@ -4,7 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { SidebarOptions, type SidebarOptionsProps } from "./SidebarOptions";
 import { cn } from "@/lib/utils";
 import { GripIcon } from "lucide-react";
-import { successMessage } from "@/lib/helper";
+import { successMessage } from "@/utils/message";
 import { deletePdfFile } from "@/lib/pdfFileStorage";
 
 export const SidebarItems = ({

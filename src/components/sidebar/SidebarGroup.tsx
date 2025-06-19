@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { usePdfStore, type PdfGroup } from "@/store/usePdfStore";
 import { ChevronDown, ChevronUp, Folder, Plus } from "lucide-react";
-import { SidebarOptions, type SidebarOptionsProps } from "./SidebarOptions";
+import { SidebarOptions} from "./SidebarOptions";
 import { useRef, useState } from "react";
 import {
   SortableContext,
@@ -9,13 +9,15 @@ import {
 } from "@dnd-kit/sortable";
 import { SidebarItems } from "./SidebarItem";
 import { useCopyConfigStore } from "@/store/useCopyConfigStore";
-import { toast } from "sonner";
 import { DropIndicator } from "../DropIndicator";
 import { BaseFileUploader } from "../BaseFileUploader";
 import { DialogRenameGroup } from "../DialogRenameGroup";
-import { deletePdfFile } from "@/lib/pdfFileStorage";
-import { useReverseUploadStore } from "@/store/useReverseUploadStore";
-import { failedMessage, successMessage } from "@/lib/helper";
+import { PdfStoreManager } from "@/managers/PdfStoreManager";
+import { handleActionWithToast } from "@/utils/withToast";
+import { NotFoundError } from "@/errors";
+import { handleBaseDrag, handlePdfFileDrop } from "@/helpers/handleDrop";
+import { CopyConfigManager } from "@/managers/CopyConfigManager";
+import { generateSidebarOptions } from "@/helpers/generateSidebarOptions";
 
 export type DropType = "file" | "group";
 
@@ -49,18 +51,10 @@ export const SidebarGroup = ({
   selected: boolean;
   setSelected: (val: string) => void;
 }) => {
-  const {
-    updateConfig,
-    groups,
-    setGroups,
-    setCurrent,
-    current,
-    addGroupOrPdfs,
-  } = usePdfStore();
+  const { current } = usePdfStore();
 
   const [collapsed, setCollapsed] = useState(true);
-  const { sections, setSections } = useCopyConfigStore();
-  const { isReverse } = useReverseUploadStore();
+  const { sections } = useCopyConfigStore();
 
   const [isDraggingToGroup, setIsDraggingToGroup] = useState(false);
   const dragCounter = useRef(0);
@@ -71,126 +65,65 @@ export const SidebarGroup = ({
     setIsDialogRenameOpen(true);
   };
 
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-
-    dragCounter.current += 1;
-    setIsDraggingToGroup(true);
+  const handleDragEnter = (e: React.DragEvent) => {
+    return handleBaseDrag(e, () => {
+      dragCounter.current += 1;
+      setIsDraggingToGroup(true);
+    });
   };
 
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    dragCounter.current -= 1;
-    if (dragCounter.current === 0) {
-      setIsDraggingToGroup(false);
-    }
+  const handleDragLeave = (e: React.DragEvent) => {
+    return handleBaseDrag(e, () => {
+      dragCounter.current -= 1;
+      if (dragCounter.current === 0) {
+        setIsDraggingToGroup(false);
+      }
+    });
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-
-    dragCounter.current = 0;
-    setIsDraggingToGroup(false);
-
-    const files = Array.from(e.dataTransfer.files);
-    const pdfFiles = files.filter((f) => f.type === "application/pdf");
-
-    if (pdfFiles.length === 0) {
-      return;
-    }
-
-    let arrayFiles = Array.from(pdfFiles);
-
-    if (isReverse) arrayFiles.reverse();
-
-    try {
-      addGroupOrPdfs(arrayFiles, group.id);
-      successMessage(`Upload ${arrayFiles.length} file(s) success`);
-    } catch (err) {
-      failedMessage("Error uploading file");
-    }
-
-    setCollapsed(false);
-
-    // pdfFiles.forEach((file) => {
-    //   console.log(file);
-    //   console.log(" - ", file.name);
-    // });
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    await handleActionWithToast(
+      () =>
+        handlePdfFileDrop(e, (files) => {
+          return PdfStoreManager.addPdfs(files, group.id);
+        }),
+      {
+        successMsg: "Files uploaded successfully",
+        errorMap: new Map([[NotFoundError, "Group not found"]]),
+      }
+    );
   };
 
   const handleCopyConfig = () => {
-    const clonedSections = structuredClone(group.config.sections);
-
-    setSections(clonedSections);
+    return CopyConfigManager.copy(group.config.sections);
   };
 
-  const handlePasteConfig = () => {
-    if (!sections) return;
-
-    const newConfig = {
-      ...group.config,
-      sections: sections,
-    };
-
-    toast.success("Config has been pasted successfully", {
-      position: "top-center",
-      richColors: true,
+  const handlePasteConfig = async () => {
+    await handleActionWithToast(() => CopyConfigManager.paste(group), {
+      successMsg: "Config has been pasted successfully",
+      errorMap: new Map([[NotFoundError, "Config not found"]]),
     });
-
-    updateConfig(group.id, newConfig);
   };
 
   const handleDeleteGroup = async () => {
-    await Promise.all(group.pdfs.map((pdf) => deletePdfFile(pdf.id)));
-
-    const newGroups = [...groups].filter((g) => g.id != group.id);
-
-    toast.success("Successfully deleted group", {
-      position: "top-center",
-      richColors: true,
+    await handleActionWithToast(() => PdfStoreManager.deleteGroup(group.id), {
+      successMsg: "Group Deleted Successfully",
+      errorMap: new Map([[NotFoundError, "Group not found"]]),
     });
-    setGroups(newGroups);
-
-    if (group.id == current?.groupId) {
-      setCurrent("", "")
-    }
   };
 
-  const options: SidebarOptionsProps[] = [
-    {
-      label: "Rename",
-      onClick: handleDialogRename,
-      isVisible: true,
-      type: "default",
-    },
-    {
-      label: "Copy Config",
-      onClick: handleCopyConfig,
-      isVisible: true,
-      type: "default",
-    },
-    {
-      label: "Paste Config",
-      onClick: handlePasteConfig,
-      isVisible: sections != null,
-      type: "default",
-    },
-    {
-      label: "Delete group",
-      onClick: handleDeleteGroup,
-      isVisible: true,
-      type: "destroy",
-    },
-  ];
+  const options = generateSidebarOptions({
+    onRename: handleDialogRename,
+    onDeleteGroup: handleDeleteGroup,
+    onPasteConfig: handlePasteConfig,
+    onCopyConfig: handleCopyConfig,
+    canPasteConfig: sections != null,
+  });
 
   const handleSelectedGroup = () => {
     if (current?.groupId != group.id) {
       const pdfId = group.pdfs.at(0)?.id ?? "";
-      setCurrent(pdfId, group.id);
+      PdfStoreManager.setCurrent(pdfId, group.id);
     }
 
     setSelected(group.id);
@@ -213,7 +146,7 @@ export const SidebarGroup = ({
         selected && !isDraggingToGroup && " bg-slate-200"
       )}
       onDrop={handleDrop}
-      onDragOver={handleDragOver}
+      onDragOver={handleBaseDrag}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
     >

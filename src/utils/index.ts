@@ -1,5 +1,4 @@
 import { ClassifiedTypeEnum, DataTypeEnum } from "@/models/pdfConfig";
-import { toast } from "sonner";
 
 export const tagStringToArray = (tagString: string | undefined): string[] =>
   (tagString || "")
@@ -31,20 +30,6 @@ export const mapDataTypeFieldEnum = (type: DataTypeEnum) => {
   }
 };
 
-export const successMessage = (message: string = "Field Updated!") => {
-  toast.success(message, {
-    position: "top-center",
-    richColors: true,
-    duration: 2000,
-  });
-};
-
-export const failedMessage = (message: string = "Failed") => {
-  toast.error(message, {
-    position: "top-center",
-    richColors: true,
-  });
-};
 
 export const traverseFileTree = (item: any, path = ""): Promise<File[]> => {
   return new Promise((resolve) => {

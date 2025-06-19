@@ -1,7 +1,7 @@
 import { Label } from "./ui/label";
 import { Grid2x2, Pencil } from "lucide-react";
 import { type TableField } from "@/models/pdfConfig";
-import { mapDataTypeFieldEnum } from "@/lib/helper";
+import { mapDataTypeFieldEnum } from "@/utils";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";

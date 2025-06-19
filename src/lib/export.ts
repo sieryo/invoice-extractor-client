@@ -1,5 +1,4 @@
 import type { PdfConfig } from "@/models/pdfConfig";
-import { failedMessage } from "./helper";
 import axios from "axios";
 import type { PdfGroup } from "@/store/usePdfStore";
 import { loadPdfFile } from "./pdfFileStorage";
@@ -91,9 +90,9 @@ function handleErrorResponse(err: any) {
       try {
         // @ts-expect-error
         const json = JSON.parse(errorText ?? "");
-        failedMessage(json.detail || "Unknown Error");
+        // failedMessage(json.detail || "Unknown Error");
       } catch (parseError) {
-        failedMessage("Error:" + errorText);
+        // failedMessage("Error:" + errorText);
       }
     };
     reader.readAsText(err.response.data);

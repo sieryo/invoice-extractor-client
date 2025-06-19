@@ -1,6 +1,6 @@
 import { useBox, type BoxState } from "@/hooks/useBox";
 import { useCurrentPdf } from "@/hooks/useCurrentPdf";
-import { successMessage } from "@/lib/helper";
+import { successMessage } from "@/utils/message";
 import {
   ClassifiedTypeEnum,
   type Box,
