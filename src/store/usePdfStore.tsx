@@ -8,6 +8,7 @@ import type { PdfConfig } from "@/models/pdfConfig";
 import { PdfConfigManager } from "@/managers/PdfConfigManager";
 import { persist } from "zustand/middleware";
 import { savePdfFile } from "@/lib/pdfFileStorage";
+import { getFileNameFromPath } from "@/lib/helper";
 
 export type PdfItem = {
   id: string;
@@ -27,6 +28,7 @@ type PdfStore = {
   groups: PdfGroup[];
   setGroups: (groups: PdfGroup[] | ((prev: PdfGroup[]) => PdfGroup[])) => void;
   addEmptyGroup: (identifier: string) => void;
+  addGroupWithPdfs: (files: any[], identifier: string) => void;
   addGroupOrPdfs: (files: any[], groupId?: string, config?: PdfConfig) => void;
   getGroup: (groupId: string) => PdfGroup | undefined;
   renameGroupIdentifier(groupId: string, newIdentifier: string): void;
@@ -109,6 +111,47 @@ export const usePdfStore = create<PdfStore>()(
 
           return { groups };
         });
+      },
+
+      addGroupWithPdfs: async (files, identifier) => {
+        const groups = [...get().groups];
+        let latestCurrent = null;
+        let latestPdfId = "";
+
+        const newGroupId = uuidv4();
+        const pdfMetas = [];
+        for (const file of files) {
+          const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+          console.log(fileNameWithoutExt);
+          const newFileName = getFileNameFromPath(fileNameWithoutExt);
+
+          const pdfId = uuidv4();
+          await savePdfFile(pdfId, file);
+
+          const pdfMeta = {
+            id: pdfId,
+            fileName: newFileName,
+          };
+
+          pdfMetas.push(pdfMeta);
+          latestPdfId = pdfId;
+        }
+
+        groups.push({
+          id: newGroupId,
+          identifier,
+          pdfs: pdfMetas,
+          config: PdfConfigManager.generate(),
+          width: DEFAULT_PDF_VIEWER_WIDTH,
+          height: DEFAULT_PDF_VIEWER_HEIGHT,
+        });
+
+        latestCurrent = {
+          groupId: newGroupId,
+          pdfId: latestPdfId,
+        };
+
+        set({ groups, current: latestCurrent });
       },
 
       addGroupOrPdfs: async (files, groupId, config) => {

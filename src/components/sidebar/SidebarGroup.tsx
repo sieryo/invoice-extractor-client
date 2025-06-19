@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { usePdfStore, type PdfGroup } from "@/store/usePdfStore";
 import { ChevronDown, ChevronUp, Folder, Plus } from "lucide-react";
 import { SidebarOptions, type SidebarOptionsProps } from "./SidebarOptions";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -14,6 +14,8 @@ import { DropIndicator } from "../DropIndicator";
 import { BaseFileUploader } from "../BaseFileUploader";
 import { DialogRenameGroup } from "../DialogRenameGroup";
 import { deletePdfFile } from "@/lib/pdfFileStorage";
+import { useReverseUploadStore } from "@/store/useReverseUploadStore";
+import { failedMessage, successMessage } from "@/lib/helper";
 
 export type DropType = "file" | "group";
 
@@ -47,16 +49,77 @@ export const SidebarGroup = ({
   selected: boolean;
   setSelected: (val: string) => void;
 }) => {
-  const { updateConfig, groups, setGroups, setCurrent, current } =
-    usePdfStore();
+  const {
+    updateConfig,
+    groups,
+    setGroups,
+    setCurrent,
+    current,
+    addGroupOrPdfs,
+  } = usePdfStore();
 
   const [collapsed, setCollapsed] = useState(true);
   const { sections, setSections } = useCopyConfigStore();
+  const { isReverse } = useReverseUploadStore();
+
+  const [isDraggingToGroup, setIsDraggingToGroup] = useState(false);
+  const dragCounter = useRef(0);
 
   const [isDialogRenameOpen, setIsDialogRenameOpen] = useState(false);
 
   const handleDialogRename = () => {
     setIsDialogRenameOpen(true);
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    dragCounter.current += 1;
+    setIsDraggingToGroup(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    dragCounter.current -= 1;
+    if (dragCounter.current === 0) {
+      setIsDraggingToGroup(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    dragCounter.current = 0;
+    setIsDraggingToGroup(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    const pdfFiles = files.filter((f) => f.type === "application/pdf");
+
+    if (pdfFiles.length === 0) {
+      return;
+    }
+
+    let arrayFiles = Array.from(pdfFiles);
+
+    if (isReverse) arrayFiles.reverse();
+
+    try {
+      addGroupOrPdfs(arrayFiles, group.id);
+      successMessage(`Upload ${arrayFiles.length} file(s) success`);
+    } catch (err) {
+      failedMessage("Error uploading file");
+    }
+
+    setCollapsed(false);
+
+    // pdfFiles.forEach((file) => {
+    //   console.log(file);
+    //   console.log(" - ", file.name);
+    // });
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
   };
 
   const handleCopyConfig = () => {
@@ -140,10 +203,16 @@ export const SidebarGroup = ({
   return (
     <div
       className={cn(
-        " rounded-lg ",
-        isDragging && "  disable-hover cursor-default bg-slate-200  ",
-        selected && " bg-slate-200"
+        " rounded-lg   ",
+        isDragging &&
+          !isDraggingToGroup &&
+          "  disable-hover cursor-default bg-slate-200 ",
+        selected && !isDraggingToGroup && " bg-slate-200"
       )}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
     >
       <DialogRenameGroup
         isOpen={isDialogRenameOpen}
@@ -154,7 +223,8 @@ export const SidebarGroup = ({
       <div
         className={cn(
           "flex items-center group  rounded-t-lg  hover:bg-slate-200  text-xs font-bold uppercase text-gray-900",
-          selected && "bg-slate-200"
+          selected && "bg-slate-200",
+          isDraggingToGroup && "bg-slate-300"
         )}
       >
         <div className=" items-center">

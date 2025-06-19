@@ -20,7 +20,7 @@ export const Route = createFileRoute("/workspace")({
 });
 
 function RouteComponent() {
-  const { group, file } = useCurrentPdf();
+  const { group, id } = useCurrentPdf();
 
   // useEffect(() => {
   //   const handleBeforeUnload = (e: any) => {
@@ -58,7 +58,7 @@ function RouteComponent() {
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={25} maxSize={25} minSize={22}>
             {/* <FileUploader /> */}
-            {file ? (
+            {id ? (
               <div className="flex flex-col h-full z-50 bg-white">
                 <div className="flex-grow overflow-auto p-4 pb-10">
                   <div className=" p-2 ">

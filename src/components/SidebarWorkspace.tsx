@@ -21,16 +21,51 @@ import { DropIndicator } from "./DropIndicator";
 import { SidebarGroup } from "./sidebar/SidebarGroup";
 import { SortableGroupWrapper } from "./SortableGroupWrapper";
 import { AddGroup } from "./AddGroup";
+import { getFolderNameFromPath, successMessage, traverseFileTree } from "@/lib/helper";
+import { X } from "lucide-react";
+import { deletePdfFile } from "@/lib/pdfFileStorage";
 
 export const SidebarWorkspace = () => {
-  const { groups, current, setGroups, getGroup, setPdfs, setCurrent } =
-    usePdfStore();
+  const {
+    groups,
+    current,
+    setGroups,
+    getGroup,
+    setPdfs,
+    setCurrent,
+    addGroupWithPdfs,
+  } = usePdfStore();
   const [active, setActive] = useState<Active | null>(null);
   const [over, setOver] = useState<Over | null>(null);
 
-  const [selectedGroupId, setSelectedGroupId] = useState("")
+  const [selectedGroupId, setSelectedGroupId] = useState("");
 
   const sensors = useSensors(useSensor(PointerSensor));
+
+  // DRAG N DROP FOLDER FROM LOCAL
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    const items = e.dataTransfer.items;
+    if (items.length !== 1) return;
+
+    const item = items[0];
+    const entry = item.webkitGetAsEntry?.();
+    if (!entry || !entry.isDirectory) return;
+
+    const allFiles: File[] = await traverseFileTree(entry);
+
+    if (allFiles.length <= 0) return;
+
+    // @ts-expect-error
+    const groupIdentifier = getFolderNameFromPath(allFiles[0].relativePath);
+    addGroupWithPdfs(allFiles, groupIdentifier);
+  };
 
   const handleGroupDragStart = (event: DragStartEvent) => {
     const { active } = event;
@@ -43,6 +78,16 @@ export const SidebarWorkspace = () => {
 
     setOver(over);
   };
+
+  const handleDeleteAllGroup = async () => {
+  await Promise.all(
+    groups.flatMap((group) => group.pdfs.map((pdf) => deletePdfFile(pdf.id)))
+  );
+
+  setGroups([]);
+  successMessage("Successfully deleted all groups")
+};
+
 
   const handleGroupDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -128,7 +173,7 @@ export const SidebarWorkspace = () => {
   const getIndex = (id: string | null) => groups.findIndex((g) => g.id === id);
 
   return (
-    <div className="bg-white text-gray-900  h-full flex flex-col px-2  ">
+    <div className="bg-white text-gray-900  h-full flex flex-col px-2   ">
       <div className=" flex justify-between items-center px-4 py-2  ">
         <div className=" text-lg font-semibold">Groups</div>
         <div className=" relative flex gap-2">
@@ -139,9 +184,20 @@ export const SidebarWorkspace = () => {
           <div>
             <AddGroup />
           </div>
+          <div>
+            <X 
+            onClick={() => {
+              handleDeleteAllGroup()
+            }}
+            className=" w-6 h-6 text-red-500" />
+          </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-10 mt-3">
+      <div
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        className="flex-1 overflow-y-auto overflow-x-hidden pb-10 mt-3"
+      >
         <DndContext
           collisionDetection={pointerWithin}
           onDragStart={handleGroupDragStart}

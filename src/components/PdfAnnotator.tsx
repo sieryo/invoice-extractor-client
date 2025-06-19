@@ -26,12 +26,79 @@ export const PDFAnnotator = () => {
 
   const { isReverse, setIsReverse } = useReverseUploadStore();
 
-
   if (!id || !file || !group || typeof file !== "object")
     return (
-      <div className=" w-full flex items-center justify-center h-full  p-12">
-        <div className=" w-[60%] h-full border border-gray-300 flex items-center justify-center">
-          <p>File not selected</p>
+      <div
+        className="items-center  relative "
+        style={{ display: "flex", flexDirection: "column" }}
+      >
+        {/* <div className=" absolute left-0 top-[8px]">
+        <PdfListSheetTrigger />
+      </div> */}
+        {/* <div className=" absolute top-4 left-2 z-[999] ">
+        <div>
+          <p>Pdf width: {Number(width).toFixed(1)}px</p>
+        </div>
+        <div>
+          <p>Pdf height: {Number(height).toFixed(1)}px</p>
+        </div>
+        <div>
+          <p>Zoom: {Number(scale).toFixed(2)}</p>
+        </div>
+      </div> */}
+        <div className="flex  p-1.5 items-center justify-between w-full bg-white border-b border-gray-200 mb-3">
+          <div className=" flex">
+            <div className="flex items-center rounded-lg border p-3 shadow-sm gap-10">
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="space-y-0.5">
+                    <Label>Reverse Upload Order</Label>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Exc. "PT HEBAT"; Singleword Exc. "OST0001"
+                </TooltipContent>
+              </Tooltip>
+              <Switch checked={isReverse} onCheckedChange={setIsReverse} />
+            </div>
+
+            <div className="flex justify-center items-center gap-3">
+              <div
+                onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}
+                className="p-2 font-semibold rounded-md cursor-pointer"
+              >
+                <Minus className="w-5 h-5 text-gray-900" />
+              </div>
+              <div
+                onClick={() => setScale((s) => s + 0.25)}
+                className="p-2 font-semibold rounded-md cursor-pointer"
+              >
+                <Plus className="w-5 h-5 text-gray-900" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <ExportTouchable
+              onBeforeExport={() => {
+                setIsLoading(true);
+              }}
+              onAfterExport={() => {
+                setIsLoading(false);
+              }}
+            >
+              <div>
+                <div className="select-none p-2 px-6 text-gray-900 font-semibold rounded-md cursor-pointer">
+                  Export
+                </div>
+              </div>
+            </ExportTouchable>
+          </div>
+        </div>
+        <div className=" w-full flex items-center justify-center h-screen  p-12">
+          <div className=" w-[60%] h-full border border-gray-300 flex items-center justify-center">
+            <p>File not selected</p>
+          </div>
         </div>
       </div>
     );
@@ -43,7 +110,7 @@ export const PDFAnnotator = () => {
     try {
       // setNumPages(pdf.numPages);
 
-      console.log(pdf)
+      console.log(pdf);
       const page = await pdf.getPage(1);
       const viewport = page.getViewport({ scale: 1 });
 
@@ -127,7 +194,7 @@ export const PDFAnnotator = () => {
         </div>
       </div>
 
-      {file && width && height && (
+      {file && width && height && file instanceof File && (
         <div
           style={{
             maxHeight: "calc(100vh - 70px)",

@@ -35,7 +35,7 @@ export const successMessage = (message: string = "Field Updated!") => {
   toast.success(message, {
     position: "top-center",
     richColors: true,
-    duration: 2000
+    duration: 2000,
   });
 };
 
@@ -45,4 +45,36 @@ export const failedMessage = (message: string = "Failed") => {
     richColors: true,
   });
 };
+
+export const traverseFileTree = (item: any, path = ""): Promise<File[]> => {
+  return new Promise((resolve) => {
+    if (item.isFile) {
+      item.file((file: File) => {
+        // @ts-expect-error
+        file.relativePath = path + file.name;
+        resolve([file]);
+      });
+    } else if (item.isDirectory) {
+      const dirReader = item.createReader();
+      dirReader.readEntries(async (entries: any[]) => {
+        const files = await Promise.all(
+          entries.map((entry) =>
+            traverseFileTree(entry, path + item.name + "/")
+          )
+        );
+        resolve(files.flat());
+      });
+    }
+  });
+};
+
+export function getFolderNameFromPath(path : string) {
+  const parts = path.split("/");
+  return parts.length > 1 ? parts[0] : "uncategorized";
+}
+
+export function getFileNameFromPath(path: string) {
+  const parts = path.split("/");
+  return parts.length > 0 ? parts[parts.length - 1] : path;
+}
 
