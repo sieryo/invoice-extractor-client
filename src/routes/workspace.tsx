@@ -118,7 +118,7 @@ function RouteComponent() {
                 </div> */}
               </div>
             ) : (
-              <div className="w-full bg-gray-50 items-center justify-center flex flex-col h-full z-50">
+              <div className="w-full bg-white items-center justify-center flex flex-col h-full z-50">
                 <p className=" text-2xl font-semibold">File not selected</p>
               </div>
             )}

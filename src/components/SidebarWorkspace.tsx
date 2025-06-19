@@ -21,7 +21,11 @@ import { DropIndicator } from "./DropIndicator";
 import { SidebarGroup } from "./sidebar/SidebarGroup";
 import { SortableGroupWrapper } from "./SortableGroupWrapper";
 import { AddGroup } from "./AddGroup";
-import { getFolderNameFromPath, successMessage, traverseFileTree } from "@/lib/helper";
+import {
+  getFolderNameFromPath,
+  successMessage,
+  traverseFileTree,
+} from "@/lib/helper";
 import { X } from "lucide-react";
 import { deletePdfFile } from "@/lib/pdfFileStorage";
 
@@ -80,14 +84,14 @@ export const SidebarWorkspace = () => {
   };
 
   const handleDeleteAllGroup = async () => {
-  await Promise.all(
-    groups.flatMap((group) => group.pdfs.map((pdf) => deletePdfFile(pdf.id)))
-  );
+    await Promise.all(
+      groups.flatMap((group) => group.pdfs.map((pdf) => deletePdfFile(pdf.id)))
+    );
 
-  setGroups([]);
-  successMessage("Successfully deleted all groups")
-};
-
+    setGroups([]);
+    setCurrent("", "");
+    successMessage("Successfully deleted all groups");
+  };
 
   const handleGroupDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -185,11 +189,12 @@ export const SidebarWorkspace = () => {
             <AddGroup />
           </div>
           <div>
-            <X 
-            onClick={() => {
-              handleDeleteAllGroup()
-            }}
-            className=" w-6 h-6 text-red-500" />
+            <X
+              onClick={() => {
+                handleDeleteAllGroup();
+              }}
+              className=" w-6 h-6 text-red-500"
+            />
           </div>
         </div>
       </div>

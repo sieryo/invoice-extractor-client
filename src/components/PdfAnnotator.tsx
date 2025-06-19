@@ -24,8 +24,6 @@ export const PDFAnnotator = () => {
   const [scale, setScale] = useState(1);
   const { setIsLoading } = useFullScreenLoadingStore();
 
-  const { isReverse, setIsReverse } = useReverseUploadStore();
-
   if (!id || !file || !group || typeof file !== "object")
     return (
       <div
@@ -48,19 +46,7 @@ export const PDFAnnotator = () => {
       </div> */}
         <div className="flex  p-1.5 items-center justify-between w-full bg-white border-b border-gray-200 mb-3">
           <div className=" flex">
-            <div className="flex items-center rounded-lg border p-3 shadow-sm gap-10">
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="space-y-0.5">
-                    <Label>Reverse Upload Order</Label>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Exc. "PT HEBAT"; Singleword Exc. "OST0001"
-                </TooltipContent>
-              </Tooltip>
-              <Switch checked={isReverse} onCheckedChange={setIsReverse} />
-            </div>
+            <ReverseUploadSwitch />
 
             <div className="flex justify-center items-center gap-3">
               <div
@@ -146,19 +132,7 @@ export const PDFAnnotator = () => {
       </div> */}
       <div className="flex  p-1.5 items-center justify-between w-full bg-white border-b border-gray-200 mb-3">
         <div className=" flex">
-          <div className="flex items-center rounded-lg border p-3 shadow-sm gap-10">
-            <Tooltip>
-              <TooltipTrigger>
-                <div className="space-y-0.5">
-                  <Label>Reverse Upload Order</Label>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                Exc. "PT HEBAT"; Singleword Exc. "OST0001"
-              </TooltipContent>
-            </Tooltip>
-            <Switch checked={isReverse} onCheckedChange={setIsReverse} />
-          </div>
+          <ReverseUploadSwitch />
 
           <div className="flex justify-center items-center gap-3">
             <div
@@ -227,6 +201,24 @@ export const PDFAnnotator = () => {
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+const ReverseUploadSwitch = () => {
+  const { isReverse, setIsReverse } = useReverseUploadStore();
+
+  return (
+    <div className="flex items-center rounded-lg border p-3 shadow-sm gap-10">
+      <Tooltip>
+        <TooltipTrigger>
+          <div className="space-y-0.5">
+            <Label>Reverse Upload file Order</Label>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>Activated: Bottom to Top; Not Activated: Top to Bottom</TooltipContent>
+      </Tooltip>
+      <Switch checked={isReverse} onCheckedChange={setIsReverse} />
     </div>
   );
 };

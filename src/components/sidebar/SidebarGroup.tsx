@@ -153,8 +153,11 @@ export const SidebarGroup = ({
       position: "top-center",
       richColors: true,
     });
-
     setGroups(newGroups);
+
+    if (group.id == current?.groupId) {
+      setCurrent("", "")
+    }
   };
 
   const options: SidebarOptionsProps[] = [
