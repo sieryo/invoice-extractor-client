@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 import { usePdfStore, type PdfGroup } from "@/store/usePdfStore";
 import { ChevronDown, ChevronUp, Folder, Plus } from "lucide-react";
-import { SidebarOptions} from "./SidebarOptions";
-import { useRef, useState } from "react";
+import { SidebarOptions } from "./SidebarOptions";
+import React, { useRef, useState } from "react";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -18,6 +18,7 @@ import { NotFoundError } from "@/errors";
 import { handleBaseDrag, handlePdfFileDrop } from "@/helpers/handleDrop";
 import { CopyConfigManager } from "@/managers/CopyConfigManager";
 import { generateSidebarOptions } from "@/helpers/generateSidebarOptions";
+import { SortableItemWrapper } from "../SortableItemWrapper";
 
 export type DropType = "file" | "group";
 
@@ -160,7 +161,7 @@ export const SidebarGroup = ({
         className={cn(
           "flex items-center group  rounded-t-lg  hover:bg-slate-200  text-xs font-bold uppercase text-gray-900",
           selected && "bg-slate-200",
-          isDraggingToGroup && "bg-slate-300"
+          isDraggingToGroup && "bg-slate-300",
         )}
       >
         <div className=" items-center">
@@ -223,24 +224,37 @@ export const SidebarGroup = ({
                 dropIndicator.overType == "file";
 
               return (
-                <div key={pdf.id}>
-                  <div className=" pl-8">
-                    {isOver &&
-                      placeIndicatorAbove &&
-                      isShowItemDropIndicator && <DropIndicator />}
+                <React.Fragment key={group.id}>
+                  <div key={pdf.id}>
+                    <div className=" pl-8">
+                      {isOver &&
+                        placeIndicatorAbove &&
+                        isShowItemDropIndicator && <DropIndicator />}
+                    </div>
+                    <SortableItemWrapper groupId={group.id} pdf={pdf}>
+                      {({ attributes, listeners, setHandleRef }) => (
+                        <SidebarItems
+                          pdf={pdf}
+                          groupId={group.id}
+                          groupSelected={selected}
+                          setGroupSelected={setSelected}
+                          dragHandleProps={{
+                            attributes,
+                            listeners,
+                            setHandleRef,
+                          }}
+                          isDragging={activeFileId != null}
+                        />
+                      )}
+                    </SortableItemWrapper>
+
+                    <div className=" pl-8">
+                      {isOver &&
+                        !placeIndicatorAbove &&
+                        isShowItemDropIndicator && <DropIndicator />}
+                    </div>
                   </div>
-                  <SidebarItems
-                    pdf={pdf}
-                    groupId={group.id}
-                    groupSelected={selected}
-                    setGroupSelected={setSelected}
-                  />
-                  <div className=" pl-8">
-                    {isOver &&
-                      !placeIndicatorAbove &&
-                      isShowItemDropIndicator && <DropIndicator />}
-                  </div>
-                </div>
+                </React.Fragment>
               );
             })}
           </SortableContext>

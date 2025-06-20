@@ -1,53 +1,49 @@
 import { useModeStore } from "@/store/useModeStore";
 import { usePdfStore, type PdfItem } from "@/store/usePdfStore";
-import { useSortable } from "@dnd-kit/sortable";
 import { SidebarOptions, type SidebarOptionsProps } from "./SidebarOptions";
 import { cn } from "@/lib/utils";
 import { GripIcon } from "lucide-react";
-import { successMessage } from "@/utils/message";
-import { deletePdfFile } from "@/lib/pdfFileStorage";
+import { handleActionWithToast } from "@/utils/withToast";
+import { PdfStoreManager } from "@/managers/PdfStoreManager";
+import { NotFoundError } from "@/errors";
 
 export const SidebarItems = ({
   pdf,
   groupId,
   setGroupSelected,
+  dragHandleProps,
+  isDragging,
 }: {
   pdf: PdfItem;
   groupId: string;
   groupSelected: boolean;
+  dragHandleProps: {
+    setHandleRef: (el: HTMLElement | null) => void;
+    listeners: any;
+    attributes: any;
+  };
   setGroupSelected: (val: string) => void;
+  isDragging: boolean;
 }) => {
-  const { current, setCurrent, getGroup, setPdfs } = usePdfStore();
+  const { current } = usePdfStore();
   const { setField } = useModeStore();
 
   const isActive = current?.pdfId === pdf.id;
-  const { attributes, listeners, setNodeRef } = useSortable({
-    id: pdf.id,
-    data: {
-      type: "file",
-      groupId,
-      pdfId: pdf.id,
-    },
-  });
 
   const handleClickItem = () => {
     setGroupSelected("");
-    setCurrent(pdf.id, groupId);
+    PdfStoreManager.setCurrent(pdf.id, groupId);
     setField(null);
   };
 
   const handleDeleteFile = async () => {
-    const currentGroup = getGroup(groupId);
-
-    await deletePdfFile(pdf.id)
-
-    if (!currentGroup) return;
-
-    const newPdfs = [...currentGroup.pdfs].filter((p) => p.id != pdf.id);
-
-    successMessage("Successfully deleted file");
-
-    setPdfs(groupId, newPdfs);
+    await handleActionWithToast(
+      () => PdfStoreManager.deletePdf(groupId, pdf.id),
+      {
+        successMsg: "File Deleted Successfully",
+        errorMap: new Map([[NotFoundError, "Group not found"]]),
+      }
+    );
   };
 
   const option: SidebarOptionsProps[] = [
@@ -62,17 +58,21 @@ export const SidebarItems = ({
   return (
     <div className=" my-1">
       <div
-        ref={setNodeRef}
         onMouseDown={handleClickItem}
         className={cn(
           "flex items-center justify-between pl-8 pr-1 py-1.5 rounded-sm group cursor-default",
-          isActive ? "bg-slate-300" : "hover:bg-slate-300"
+          isActive && "bg-slate-300",
+          !isDragging && "hover:bg-slate-300"
         )}
       >
-        <div {...listeners} {...attributes} className=" flex-1">
+        <div
+          ref={dragHandleProps.setHandleRef}
+          {...dragHandleProps.listeners}
+          {...dragHandleProps.attributes}
+          className=" flex-1"
+        >
           <div className="flex items-center gap-2 w-full">
             <div
-              ref={setNodeRef}
               className=" p-1 rounded cursor-default "
               title="Drag to reorder"
             >

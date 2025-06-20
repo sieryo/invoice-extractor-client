@@ -1,5 +1,4 @@
 import { successMessage, errorMessage } from "@/utils/message";
-import { toast } from "sonner";
 
 export async function handleActionWithToast(
   action: () => Promise<void>,
@@ -25,6 +24,6 @@ export async function handleActionWithToast(
         }
       }
     }
-    toast.error(fallbackError);
+    errorMessage(fallbackError);
   }
 }

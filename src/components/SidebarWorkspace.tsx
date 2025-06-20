@@ -21,24 +21,14 @@ import { DropIndicator } from "./DropIndicator";
 import { SidebarGroup } from "./sidebar/SidebarGroup";
 import { SortableGroupWrapper } from "./SortableGroupWrapper";
 import { AddGroup } from "./AddGroup";
-import {
-  getFolderNameFromPath,
-  traverseFileTree,
-} from "@/utils";
-import { successMessage } from "@/utils/message";
 import { X } from "lucide-react";
-import { deletePdfFile } from "@/lib/pdfFileStorage";
+import { PdfStoreManager } from "@/managers/PdfStoreManager";
+import { handleActionWithToast } from "@/utils/withToast";
+import { handleFolderDrop } from "@/helpers/handleDrop";
 
 export const SidebarWorkspace = () => {
-  const {
-    groups,
-    current,
-    setGroups,
-    getGroup,
-    setPdfs,
-    setCurrent,
-    addGroupWithPdfs,
-  } = usePdfStore();
+  const { groups, current, setGroups, getGroup, setPdfs, setCurrent } =
+    usePdfStore();
   const [active, setActive] = useState<Active | null>(null);
   const [over, setOver] = useState<Over | null>(null);
 
@@ -53,22 +43,15 @@ export const SidebarWorkspace = () => {
   };
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-
-    const items = e.dataTransfer.items;
-    if (items.length !== 1) return;
-
-    const item = items[0];
-    const entry = item.webkitGetAsEntry?.();
-    if (!entry || !entry.isDirectory) return;
-
-    const allFiles: File[] = await traverseFileTree(entry);
-
-    if (allFiles.length <= 0) return;
-
-    // @ts-expect-error
-    const groupIdentifier = getFolderNameFromPath(allFiles[0].relativePath);
-    addGroupWithPdfs(allFiles, groupIdentifier);
+    await handleActionWithToast(
+      () =>
+        handleFolderDrop(e, (files, folderName) => {
+          return PdfStoreManager.addGroupWithPdfs(files, folderName);
+        }),
+      {
+        successMsg: "Folder uploaded successfully",
+      }
+    );
   };
 
   const handleGroupDragStart = (event: DragStartEvent) => {
@@ -84,13 +67,9 @@ export const SidebarWorkspace = () => {
   };
 
   const handleDeleteAllGroup = async () => {
-    await Promise.all(
-      groups.flatMap((group) => group.pdfs.map((pdf) => deletePdfFile(pdf.id)))
-    );
-
-    setGroups([]);
-    setCurrent("", "");
-    successMessage("Successfully deleted all groups");
+    await handleActionWithToast(() => PdfStoreManager.deleteAllGroup(), {
+      successMsg: "Successfully deleted all groups",
+    });
   };
 
   const handleGroupDragEnd = (event: DragEndEvent) => {
@@ -100,79 +79,80 @@ export const SidebarWorkspace = () => {
 
     if (!over || active.id === over.id) return;
 
-    const overId = over.id;
-
     const activeData = active.data.current;
     const overData = over.data.current;
 
-    // Handle file -> file
     if (activeData?.type === "file" && overData?.type === "file") {
-      const fromGroupId = activeData.groupId;
-      const toGroupId = overData.groupId;
-      const pdfId = activeData.pdfId;
-      const targetPdfId = overData.pdfId;
-
-      const fromGroup = getGroup(fromGroupId);
-      const toGroup = getGroup(toGroupId);
-
-      if (!fromGroup || !toGroup) return;
-
-      const pdfToMove = fromGroup.pdfs.find((p) => p.id === pdfId);
-      if (!pdfToMove) return;
-
-      let newFromPdfs = fromGroup.pdfs.filter((p) => p.id !== pdfId);
-
-      const targetIndex = toGroup.pdfs.findIndex((p) => p.id === targetPdfId);
-
-      let newToPdfs = [...toGroup.pdfs];
-
-      if (fromGroupId !== toGroupId) {
-        newToPdfs.splice(targetIndex + 1, 0, pdfToMove);
-        setPdfs(fromGroupId, newFromPdfs);
-        setPdfs(toGroupId, newToPdfs);
-
-        setCurrent(pdfId, toGroupId);
-      } else {
-        const oldIndex = fromGroup.pdfs.findIndex((p) => p.id === pdfId);
-        const newIndex = targetIndex;
-
-        const reordered = arrayMove(fromGroup.pdfs, oldIndex, newIndex);
-        setPdfs(fromGroupId, reordered);
-      }
+      handleFileToFile(activeData, overData);
     }
 
-    // Handle file -> group
     if (activeData?.type === "file" && overData?.type === "group") {
-      const fromGroupId = activeData.groupId;
-      const pdfId = activeData.pdfId;
-      const toGroupId = overId.toString();
-
-      if (fromGroupId === toGroupId) return;
-
-      const fromGroup = getGroup(fromGroupId);
-      const toGroup = getGroup(toGroupId);
-
-      if (!fromGroup || !toGroup) return;
-
-      const pdfToMove = fromGroup.pdfs.find((p) => p.id === pdfId);
-      if (!pdfToMove) return;
-
-      const newFromPdfs = fromGroup.pdfs.filter((p) => p.id !== pdfId);
-      setPdfs(fromGroupId, newFromPdfs);
-
-      const newToPdfs = [...toGroup.pdfs, pdfToMove];
-      setPdfs(toGroupId, newToPdfs);
-
-      setCurrent(pdfId, toGroupId);
+      handleFileToGroup(activeData, over.id.toString());
     }
-    // handle group -> group
+
     if (activeData?.type === "group" && overData?.type === "group") {
-      const oldIndex = groups.findIndex((g) => g.id === active.id);
-      const newIndex = groups.findIndex((g) => g.id === over.id);
-      const newGroups = arrayMove(groups, oldIndex, newIndex);
-      setGroups(newGroups);
+      handleGroupToGroup(active.id.toString(), over.id.toString());
     }
   };
+
+  function handleFileToFile(activeData: any, overData: any) {
+    const { groupId: fromGroupId, pdfId } = activeData;
+    const { groupId: toGroupId, pdfId: targetPdfId } = overData;
+
+    const fromGroup = getGroup(fromGroupId);
+    const toGroup = getGroup(toGroupId);
+    if (!fromGroup || !toGroup) return;
+
+    const pdfToMove = fromGroup.pdfs.find((p) => p.id === pdfId);
+    if (!pdfToMove) return;
+
+    if (fromGroupId !== toGroupId) {
+      const newFromPdfs = fromGroup.pdfs.filter((p) => p.id !== pdfId);
+      const targetIndex = toGroup.pdfs.findIndex((p) => p.id === targetPdfId);
+      const newToPdfs = [...toGroup.pdfs];
+      newToPdfs.splice(targetIndex + 1, 0, pdfToMove);
+
+      setPdfs(fromGroupId, newFromPdfs);
+      setPdfs(toGroupId, newToPdfs);
+      setCurrent(pdfId, toGroupId);
+    } else {
+      const oldIndex = fromGroup.pdfs.findIndex((p) => p.id === pdfId);
+      const newIndex = toGroup.pdfs.findIndex((p) => p.id === targetPdfId);
+      if (oldIndex < 0 || newIndex < 0) return;
+
+      const reordered = arrayMove(fromGroup.pdfs, oldIndex, newIndex);
+      setPdfs(fromGroupId, reordered);
+    }
+  }
+
+  function handleFileToGroup(activeData: any, toGroupId: string) {
+    const { groupId: fromGroupId, pdfId } = activeData;
+
+    if (fromGroupId === toGroupId) return;
+
+    const fromGroup = getGroup(fromGroupId);
+    const toGroup = getGroup(toGroupId);
+    if (!fromGroup || !toGroup) return;
+
+    const pdfToMove = fromGroup.pdfs.find((p) => p.id === pdfId);
+    if (!pdfToMove) return;
+
+    const newFromPdfs = fromGroup.pdfs.filter((p) => p.id !== pdfId);
+    const newToPdfs = [...toGroup.pdfs, pdfToMove];
+
+    setPdfs(fromGroupId, newFromPdfs);
+    setPdfs(toGroupId, newToPdfs);
+    setCurrent(pdfId, toGroupId);
+  }
+
+  function handleGroupToGroup(activeId: string, overId: string) {
+    const oldIndex = groups.findIndex((g) => g.id === activeId);
+    const newIndex = groups.findIndex((g) => g.id === overId);
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const newGroups = arrayMove(groups, oldIndex, newIndex);
+    setGroups(newGroups);
+  }
 
   const getIndex = (id: string | null) => groups.findIndex((g) => g.id === id);
 

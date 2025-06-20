@@ -1,25 +1,22 @@
-import { NotFoundError } from "@/errors";
+import { throwNotFoundGroup } from "@/helpers/notFound";
 import { deletePdfFile } from "@/lib/pdfFileStorage";
 import type { PdfConfig } from "@/models/pdfConfig";
-import { usePdfStore } from "@/store/usePdfStore";
+import { usePdfStore, type PdfGroup } from "@/store/usePdfStore";
 import { useReverseUploadStore } from "@/store/useReverseUploadStore";
 
-// Add pdf file DONE
-// Add group
-// Upload folders
-// clear currentState
-// update config
-// update groups (setGroups)
-// update posisi (setPdfs)
 export class PdfStoreManager {
-  public static async deleteGroup(groupId: string): Promise<void> {
-    const { setGroups, setCurrent, getGroup, groups, current } =
-      usePdfStore.getState();
+  public static getGroupById(groudId: string): PdfGroup | undefined {
+    const getGroup = usePdfStore.getState().getGroup;
 
-    const group = getGroup(groupId);
+    return getGroup(groudId);
+  }
+  public static async deleteGroup(groupId: string): Promise<void> {
+    const { setGroups, groups, current } = usePdfStore.getState();
+
+    const group = this.getGroupById(groupId);
 
     if (!group) {
-      throw new NotFoundError("Group not found.");
+      return throwNotFoundGroup();
     }
 
     await Promise.all(
@@ -31,8 +28,25 @@ export class PdfStoreManager {
     setGroups(newGroups);
 
     if (group.id == current?.groupId) {
-      setCurrent("", "");
+      this.clearCurrent();
     }
+  }
+
+  public static async deleteAllGroup() {
+    const { groups, setGroups } = usePdfStore.getState();
+
+    await Promise.all(
+      groups.flatMap((group) => group.pdfs.map((pdf) => deletePdfFile(pdf.id)))
+    );
+
+    setGroups([]);
+    this.clearCurrent();
+  }
+
+  public static async addGroupWithPdfs(files: any[], identifier: string) {
+    const addGroupWithPdfs = usePdfStore.getState().addGroupWithPdfs;
+
+    addGroupWithPdfs(files, identifier);
   }
 
   public static async addPdfs(files: any[], groupId: string) {
@@ -41,6 +55,22 @@ export class PdfStoreManager {
     if (isReverse) files.reverse();
 
     await usePdfStore.getState().addPdfs(files, groupId);
+  }
+
+  public static async deletePdf(groupId: string, pdfId: string) {
+    const setPdfs = usePdfStore.getState().setPdfs;
+
+    const currentGroup = this.getGroupById(groupId);
+
+    if (!currentGroup) {
+      return throwNotFoundGroup();
+    }
+
+    await this.deletePdfFileWrapper(pdfId);
+
+    const newPdfs = [...currentGroup.pdfs].filter((p) => p.id != pdfId);
+
+    setPdfs(groupId, newPdfs);
   }
 
   public static updateConfig(groudId: string, config: PdfConfig) {
@@ -53,6 +83,10 @@ export class PdfStoreManager {
     const setCurrent = usePdfStore.getState().setCurrent;
 
     setCurrent(pdfId, groupId);
+  }
+
+  static clearCurrent() {
+    this.setCurrent("", "");
   }
 
   static async deletePdfFileWrapper(pdfId: string) {
