@@ -22,19 +22,6 @@ export const Route = createFileRoute("/workspace")({
 function RouteComponent() {
   const { group, id } = useCurrentPdf();
 
-  // useEffect(() => {
-  //   const handleBeforeUnload = (e: any) => {
-  //     if (!file) return;
-  //     e.preventDefault();
-  //     e.returnValue = "";
-  //   };
-
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //   };
-  // }, [file]);
-
   return (
     <div className="w-full h-screen bg-gray-50 flex">
       <ModeBanner />

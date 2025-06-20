@@ -12,7 +12,6 @@ export const useCurrentPdf = () => {
     let canceled = false;
 
     const loadFile = async () => {
-      console.log("🔁 loadFile triggered");
 
       try {
         const pdfId = current ? current.pdfId : "";

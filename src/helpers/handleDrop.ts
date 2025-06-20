@@ -1,4 +1,4 @@
-import { traverseFileTree } from "@/utils";
+import { getFolderNameFromPath, traverseFileTree } from "@/utils";
 
 export async function handleFolderDrop(
   e: React.DragEvent,
@@ -8,11 +8,10 @@ export async function handleFolderDrop(
 
   const items = e.dataTransfer.items;
   if (items.length !== 1) return;
-
+  
   const item = items[0];
   const entry = item.webkitGetAsEntry?.();
-  if (!entry || !entry.isDirectory) return;
-
+  
   const allFiles = await traverseFileTree(entry);
   if (allFiles.length <= 0) return;
 

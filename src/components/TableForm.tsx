@@ -21,7 +21,6 @@ export const TableForm = ({}: {}) => {
       (field) => field.name === targetField.name
     );
 
-    console.log(exists);
 
     setIsHasColumnIndex(exists);
   }, [group]);
