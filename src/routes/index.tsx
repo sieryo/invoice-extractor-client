@@ -1,5 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { UploadPage } from "@/components/UploadPage";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/")({
   component: App,
@@ -7,6 +8,10 @@ export const Route = createFileRoute("/")({
 
 function App() {
   const router = useRouter();
+
+  useEffect(() => {
+    router.navigate({ to: "/workspace" });
+  }, []);
   return (
     <div className="text-center">
       <UploadPage

@@ -61,14 +61,9 @@ async function buildFormDataMulti(groups: PdfGroup[]) {
 
 function triggerDownload(response: any) {
   const url = window.URL.createObjectURL(new Blob([response.data]));
-  const contentDisposition = response.headers["content-disposition"];
   const exportedName = response.headers.get("X-Exported-Filename");
 
   let filename = `${exportedName}.xlsx`;
-  if (contentDisposition) {
-    const match = contentDisposition.match(/filename="?(.+)"?/);
-    if (match) filename = match[1];
-  }
 
   const link = document.createElement("a");
   link.href = url;
@@ -115,7 +110,7 @@ export const handleExport = async (
 
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_API_BASE}/export`,
+      `${import.meta.env.VITE_API_BASE}/api/export`,
       formData,
       {
         responseType: "blob",

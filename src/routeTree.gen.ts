@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as WorkspaceImport } from './routes/workspace'
 import { Route as IndexImport } from './routes/index'
+import { Route as MasterBuyersImport } from './routes/master/buyers'
 
 // Create/Update Routes
 
@@ -25,6 +26,12 @@ const WorkspaceRoute = WorkspaceImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MasterBuyersRoute = MasterBuyersImport.update({
+  id: '/master/buyers',
+  path: '/master/buyers',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -46,6 +53,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceImport
       parentRoute: typeof rootRoute
     }
+    '/master/buyers': {
+      id: '/master/buyers'
+      path: '/master/buyers'
+      fullPath: '/master/buyers'
+      preLoaderRoute: typeof MasterBuyersImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -54,36 +68,41 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/workspace': typeof WorkspaceRoute
+  '/master/buyers': typeof MasterBuyersRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/workspace': typeof WorkspaceRoute
+  '/master/buyers': typeof MasterBuyersRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/workspace': typeof WorkspaceRoute
+  '/master/buyers': typeof MasterBuyersRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/workspace'
+  fullPaths: '/' | '/workspace' | '/master/buyers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/workspace'
-  id: '__root__' | '/' | '/workspace'
+  to: '/' | '/workspace' | '/master/buyers'
+  id: '__root__' | '/' | '/workspace' | '/master/buyers'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   WorkspaceRoute: typeof WorkspaceRoute
+  MasterBuyersRoute: typeof MasterBuyersRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   WorkspaceRoute: WorkspaceRoute,
+  MasterBuyersRoute: MasterBuyersRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +116,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/workspace"
+        "/workspace",
+        "/master/buyers"
       ]
     },
     "/": {
@@ -105,6 +125,9 @@ export const routeTree = rootRoute
     },
     "/workspace": {
       "filePath": "workspace.tsx"
+    },
+    "/master/buyers": {
+      "filePath": "master/buyers.tsx"
     }
   }
 }

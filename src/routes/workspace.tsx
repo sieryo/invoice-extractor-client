@@ -23,7 +23,7 @@ function RouteComponent() {
   const { group, id } = useCurrentPdf();
 
   return (
-    <div className="w-full h-screen bg-gray-50 flex">
+    <div className="w-full h-screen bg-gray-50">
       <ModeBanner />
       <div className=" w-full h-full flex">
         <ResizablePanelGroup

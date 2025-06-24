@@ -4,7 +4,7 @@ import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 import { ChevronUpIcon, EditIcon } from "lucide-react";
 import { Button } from "../ui/button";
-import { tagStringToArray } from "@/lib/helper";
+import { tagStringToArray } from "@/utils";
 
 export interface TagInputProps extends TextareaProps {}
 
