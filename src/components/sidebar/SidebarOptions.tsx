@@ -38,13 +38,13 @@ export const SidebarOptions = ({
 
           if (opt.type == "default") {
             return (
-              <DropdownMenuItem onClick={opt.onClick}>
+              <DropdownMenuItem key={opt.label} onClick={opt.onClick}>
                 {opt.label}
               </DropdownMenuItem>
             );
           } else if (opt.type == "destroy") {
             return (
-              <DropdownItemDelete onClick={opt.onClick} label={opt.label} />
+              <DropdownItemDelete key={opt.label} onClick={opt.onClick} label={opt.label} />
             );
           }
         })}

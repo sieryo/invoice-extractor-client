@@ -60,7 +60,7 @@ export const SidebarItems = ({
       <div
         onMouseDown={handleClickItem}
         className={cn(
-          "flex items-center justify-between pl-8 pr-1 py-1.5 rounded-sm group cursor-default",
+          "items-center justify-between pl-8 pr-1 py-1.5 rounded-sm group cursor-default relative ",
           isActive && "bg-slate-300",
           !isDragging && "hover:bg-slate-300"
         )}
@@ -69,9 +69,8 @@ export const SidebarItems = ({
           ref={dragHandleProps.setHandleRef}
           {...dragHandleProps.listeners}
           {...dragHandleProps.attributes}
-          className=" flex-1"
         >
-          <div className="flex items-center gap-2 w-full">
+          <div className="flex items-center gap-2 min-w-0 pr-6  ">
             <div
               className=" p-1 rounded cursor-default "
               title="Drag to reorder"
@@ -86,7 +85,7 @@ export const SidebarItems = ({
 
             <span
               className={cn(
-                "text-xs truncate flex-1 font-semibold select-none ",
+                "text-xs truncate   font-semibold select-none",
                 isActive ? "text-gray-900" : "text-gray-700"
               )}
             >
@@ -94,7 +93,7 @@ export const SidebarItems = ({
             </span>
           </div>
         </div>
-        <div className=" ">
+        <div className=" absolute right-0  top-[16%]">
           <SidebarOptions options={option} />
         </div>
       </div>

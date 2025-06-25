@@ -7,6 +7,11 @@ export async function handleFolderDrop(
   e.preventDefault();
 
   const items = e.dataTransfer.items;
+   const files = Array.from(e.dataTransfer.files);
+  const pdfFiles = files.filter((f) => f.type === "application/pdf");
+
+  if (pdfFiles.length != 0) return;
+
   if (items.length !== 1) return;
   
   const item = items[0];

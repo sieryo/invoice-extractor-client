@@ -31,7 +31,7 @@ type PdfStore = {
   addEmptyGroup: (identifier: string) => void;
   addGroupWithPdfs: (files: any[], identifier: string) => Promise<void>;
   addPdfs: (files: any[], groupId: string) => Promise<void>;
-  getGroup: (groupId: string) => PdfGroup | undefined;
+  getGroup: (groupId: string | undefined) => PdfGroup | undefined;
   renameGroupIdentifier(groupId: string, newIdentifier: string): void;
   movePdfToGroup: (
     fromGroupId: string,
@@ -178,13 +178,11 @@ export const usePdfStore = create<PdfStore>()(
             fileName: fileNameWithoutExt,
           };
 
-          if (existingGroup) {
-            existingGroup.pdfs.push(pdfMeta);
-            latestCurrent = {
-              groupId: existingGroup.id,
-              pdfId,
-            };
-          }
+          existingGroup.pdfs.push(pdfMeta);
+          latestCurrent = {
+            groupId: existingGroup.id,
+            pdfId,
+          };
         }
 
         set({ groups, current: latestCurrent });

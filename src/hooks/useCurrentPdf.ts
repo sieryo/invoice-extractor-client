@@ -3,23 +3,23 @@ import { usePdfStore } from "@/store/usePdfStore";
 import { useEffect, useState } from "react";
 
 export const useCurrentPdf = () => {
-  const { currentPdf, updateConfig, current, updateDimensions, getGroup } =
+  const { currentPdf, updateConfig, updateDimensions, getGroup } =
     usePdfStore();
 
   const [file, setFile] = useState<any>(undefined);
+  const currentPdfId = usePdfStore((state) => state.current?.pdfId);
+  const currentGroupId = usePdfStore((state) => state.current?.groupId);
 
   useEffect(() => {
     let canceled = false;
 
     const loadFile = async () => {
-
       try {
-        const pdfId = current ? current.pdfId : "";
-        if (!pdfId) {
-          setFile(undefined)
-          return
-        };
-        const file = await loadPdfFile(pdfId);
+        if (!currentPdfId) {
+          setFile(undefined);
+          return;
+        }
+        const file = await loadPdfFile(currentPdfId);
 
         if (!canceled) {
           setFile(file);
@@ -36,12 +36,12 @@ export const useCurrentPdf = () => {
     return () => {
       canceled = true;
     };
-  }, [current?.pdfId]);
+  }, [currentPdfId]);
 
   const pdf = currentPdf();
 
   return {
-    group: getGroup(current ? current.groupId : ""),
+    group: getGroup(currentGroupId),
     pdf,
     file: file,
     updateConfig,

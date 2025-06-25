@@ -70,6 +70,8 @@ export class PdfStoreManager {
 
     const newPdfs = [...currentGroup.pdfs].filter((p) => p.id != pdfId);
 
+    this.setCurrent("", "")
+
     setPdfs(groupId, newPdfs);
   }
 

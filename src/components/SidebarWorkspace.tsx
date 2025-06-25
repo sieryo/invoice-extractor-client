@@ -24,7 +24,8 @@ import { AddGroup } from "./AddGroup";
 import { X } from "lucide-react";
 import { PdfStoreManager } from "@/managers/PdfStoreManager";
 import { handleActionWithToast } from "@/utils/withToast";
-import { handleFolderDrop } from "@/helpers/handleDrop";
+import { getFolderNameFromPath, traverseFileTree } from "@/utils";
+import { successMessage } from "@/utils/message";
 
 export const SidebarWorkspace = () => {
   const { groups, current, setGroups, getGroup, setPdfs, setCurrent } =
@@ -43,15 +44,25 @@ export const SidebarWorkspace = () => {
   };
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    await handleActionWithToast(
-      () =>
-        handleFolderDrop(e, (files, folderName) => {
-          return PdfStoreManager.addGroupWithPdfs(files, folderName);
-        }),
-      {
-        successMsg: "Folder uploaded successfully",
-      }
-    );
+    e.preventDefault();
+
+    const items = e.dataTransfer.items;
+    const files = Array.from(e.dataTransfer.files);
+    const pdfFiles = files.filter((f) => f.type === "application/pdf");
+
+    if (pdfFiles.length != 0) return;
+
+    const item = items[0];
+    const entry = item.webkitGetAsEntry?.();
+
+    const allFiles: File[] = await traverseFileTree(entry);
+
+    if (allFiles.length <= 0) return;
+
+    // @ts-expect-error
+    const groupIdentifier = getFolderNameFromPath(allFiles[0].relativePath);
+    PdfStoreManager.addGroupWithPdfs(allFiles, groupIdentifier);
+    successMessage("Folder uploaded successfully");
   };
 
   const handleGroupDragStart = (event: DragStartEvent) => {
@@ -165,9 +176,9 @@ export const SidebarWorkspace = () => {
             <BaseFileUploader />
             <Plus className=" w-6 h-6 text-gray-800" />
           </div> */}
-          <div>
+          {/* <div>
             <AddGroup />
-          </div>
+          </div> */}
           <div>
             <X
               onClick={() => {

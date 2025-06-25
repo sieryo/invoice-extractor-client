@@ -2,6 +2,7 @@ import type { PdfConfig } from "@/models/pdfConfig";
 import axios from "axios";
 import type { PdfGroup } from "@/store/usePdfStore";
 import { loadPdfFile } from "./pdfFileStorage";
+import { errorMessage } from "@/utils/message";
 
 function buildHeaderConfig(config: PdfConfig) {
   return {
@@ -85,9 +86,9 @@ function handleErrorResponse(err: any) {
       try {
         // @ts-expect-error
         const json = JSON.parse(errorText ?? "");
-        // failedMessage(json.detail || "Unknown Error");
+        errorMessage(json.detail || "Unknown Error");
       } catch (parseError) {
-        // failedMessage("Error:" + errorText);
+        errorMessage("Error:" + errorText);
       }
     };
     reader.readAsText(err.response.data);

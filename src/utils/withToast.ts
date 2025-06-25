@@ -8,7 +8,7 @@ export async function handleActionWithToast(
     fallbackError = "Unexpected error",
   }: {
     successMsg?: string;
-    errorMap?: Map<Function, string>; // error class to message
+    errorMap?: Map<Function, string>;
     fallbackError?: string;
   }
 ) {
@@ -24,6 +24,30 @@ export async function handleActionWithToast(
         }
       }
     }
+
+    if (err?.response) {
+      const res = err.response;
+
+      if (res.data instanceof Blob && res.data.type === "application/json") {
+        const reader = new FileReader();
+        reader.onload = function () {
+          try {
+            const json = JSON.parse(reader.result as string);
+            errorMessage(json?.detail || fallbackError);
+          } catch {
+            errorMessage(fallbackError);
+          }
+        };
+        reader.readAsText(res.data);
+        return;
+      }
+
+      if (res.data?.detail || res.data?.message) {
+        errorMessage(res.data.detail || res.data.message);
+        return;
+      }
+    }
+
     errorMessage(fallbackError);
   }
 }

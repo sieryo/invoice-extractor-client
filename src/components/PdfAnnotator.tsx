@@ -15,6 +15,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Label } from "./ui/label";
 import { useReverseUploadStore } from "@/store/useReverseUploadStore";
 import { Switch } from "./ui/switch";
+import { DialogUpdateLawanTransaksi } from "./DialogUpdateLawanTransaksi";
+import { DialogRenameFaktur } from "./DialogRenameFaktur";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
@@ -23,6 +25,54 @@ export const PDFAnnotator = () => {
 
   const [scale, setScale] = useState(1);
   const { setIsLoading } = useFullScreenLoadingStore();
+
+  const Navbar = () => {
+    return (
+      <div className="flex  p-1.5 items-center justify-between w-full bg-white border-b border-gray-200 mb-3">
+        <div className=" flex">
+          {/* <ReverseUploadSwitch /> */}
+
+          <div className="flex justify-center items-center gap-3">
+            <div
+              onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}
+              className="p-2 font-semibold rounded-md cursor-pointer"
+            >
+              <Minus className="w-5 h-5 text-gray-900" />
+            </div>
+            <div
+              onClick={() => setScale((s) => s + 0.25)}
+              className="p-2 font-semibold rounded-md cursor-pointer"
+            >
+              <Plus className="w-5 h-5 text-gray-900" />
+            </div>
+            <div>
+              <DialogUpdateLawanTransaksi />
+            </div>
+          </div>
+          <div className=" px-3 ">
+            <DialogRenameFaktur />
+          </div>
+        </div>
+
+        <div>
+          <ExportTouchable
+            onBeforeExport={() => {
+              setIsLoading(true);
+            }}
+            onAfterExport={() => {
+              setIsLoading(false);
+            }}
+          >
+            <div>
+              <div className="select-none p-2 px-6 text-gray-900 font-semibold rounded-md cursor-pointer">
+                Export
+              </div>
+            </div>
+          </ExportTouchable>
+        </div>
+      </div>
+    );
+  };
 
   if (!id || !file || !group || typeof file !== "object")
     return (
@@ -44,43 +94,7 @@ export const PDFAnnotator = () => {
           <p>Zoom: {Number(scale).toFixed(2)}</p>
         </div>
       </div> */}
-        <div className="flex  p-1.5 items-center justify-between w-full bg-white border-b border-gray-200 mb-3">
-          <div className=" flex">
-            <ReverseUploadSwitch />
-
-            <div className="flex justify-center items-center gap-3">
-              <div
-                onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}
-                className="p-2 font-semibold rounded-md cursor-pointer"
-              >
-                <Minus className="w-5 h-5 text-gray-900" />
-              </div>
-              <div
-                onClick={() => setScale((s) => s + 0.25)}
-                className="p-2 font-semibold rounded-md cursor-pointer"
-              >
-                <Plus className="w-5 h-5 text-gray-900" />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <ExportTouchable
-              onBeforeExport={() => {
-                setIsLoading(true);
-              }}
-              onAfterExport={() => {
-                setIsLoading(false);
-              }}
-            >
-              <div>
-                <div className="select-none p-2 px-6 text-gray-900 font-semibold rounded-md cursor-pointer">
-                  Export
-                </div>
-              </div>
-            </ExportTouchable>
-          </div>
-        </div>
+        <Navbar />
         <div className=" w-full flex items-center justify-center h-screen  p-12">
           <div className=" w-[60%] h-full border border-gray-300 flex items-center justify-center">
             <p>File not selected</p>
@@ -105,7 +119,11 @@ export const PDFAnnotator = () => {
         height: viewport.height,
       });
     } catch (err) {
-      console.error(err);
+      // @ts-expect-error
+      if (err?.message?.includes("sendWithPromise")) {
+        console.warn("Ignored error: PDF was likely disposed", err);
+        return;
+      }
     } finally {
       //
     }
@@ -130,43 +148,7 @@ export const PDFAnnotator = () => {
           <p>Zoom: {Number(scale).toFixed(2)}</p>
         </div>
       </div> */}
-      <div className="flex  p-1.5 items-center justify-between w-full bg-white border-b border-gray-200 mb-3">
-        <div className=" flex">
-          <ReverseUploadSwitch />
-
-          <div className="flex justify-center items-center gap-3">
-            <div
-              onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}
-              className="p-2 font-semibold rounded-md cursor-pointer"
-            >
-              <Minus className="w-5 h-5 text-gray-900" />
-            </div>
-            <div
-              onClick={() => setScale((s) => s + 0.25)}
-              className="p-2 font-semibold rounded-md cursor-pointer"
-            >
-              <Plus className="w-5 h-5 text-gray-900" />
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <ExportTouchable
-            onBeforeExport={() => {
-              setIsLoading(true);
-            }}
-            onAfterExport={() => {
-              setIsLoading(false);
-            }}
-          >
-            <div>
-              <div className="select-none p-2 px-6 text-gray-900 font-semibold rounded-md cursor-pointer">
-                Export
-              </div>
-            </div>
-          </ExportTouchable>
-        </div>
-      </div>
+      <Navbar />
 
       {file && width && height && file instanceof File && (
         <div
@@ -216,7 +198,9 @@ const ReverseUploadSwitch = () => {
             <Label>Reverse Upload file Order</Label>
           </div>
         </TooltipTrigger>
-        <TooltipContent>Activated: Bottom to Top; Not Activated: Top to Bottom</TooltipContent>
+        <TooltipContent>
+          Activated: Bottom to Top; Not Activated: Top to Bottom
+        </TooltipContent>
       </Tooltip>
       <Switch checked={isReverse} onCheckedChange={setIsReverse} />
     </div>

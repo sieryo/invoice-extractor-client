@@ -224,7 +224,7 @@ export const SidebarGroup = ({
                 dropIndicator.overType == "file";
 
               return (
-                <React.Fragment key={group.id}>
+                <React.Fragment key={pdf.id}>
                   <div key={pdf.id}>
                     <div className=" pl-8">
                       {isOver &&
