@@ -12,13 +12,6 @@ export const Route = createFileRoute("/master/buyers")({
   component: RouteComponent,
 });
 
-// const fetchBuyers = async () => {
-//   const res = await axios.get(`${import.meta.env.VITE_API_BASE}/api/buyers`);
-
-//   const normalized = res.data.map((item: any) => normalizeObject(item));
-//   console.log(normalized);
-// };
-
 function RouteComponent() {
   // useEffect(() => {
   //   fetchBuyers();

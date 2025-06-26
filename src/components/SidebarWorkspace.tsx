@@ -20,7 +20,6 @@ import React, { useState } from "react";
 import { DropIndicator } from "./DropIndicator";
 import { SidebarGroup } from "./sidebar/SidebarGroup";
 import { SortableGroupWrapper } from "./SortableGroupWrapper";
-import { AddGroup } from "./AddGroup";
 import { X } from "lucide-react";
 import { PdfStoreManager } from "@/managers/PdfStoreManager";
 import { handleActionWithToast } from "@/utils/withToast";

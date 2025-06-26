@@ -1,3 +1,4 @@
+import { BASE_API_PATH } from "@/constants/api";
 import { handleActionWithToast } from "@/utils/withToast";
 import axios from "axios";
 
@@ -20,7 +21,7 @@ export const handleUpdateLawanTransaksi = async (
 
   try {
     await axios.post(
-      `${import.meta.env.VITE_API_BASE}/api/update-lawan-transaksi`,
+      `${BASE_API_PATH}/update-lawan-transaksi`,
       formData,
       {
         headers: {

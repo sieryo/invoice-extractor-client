@@ -48,7 +48,7 @@ function RouteComponent() {
             {id ? (
               <div className="flex flex-col h-full z-50 bg-white">
                 <div className="flex-grow overflow-auto p-4 pb-10">
-                  <div className=" p-2 ">
+                  <div className=" pb-2 ">
                     <h2 className=" font-semibold text-xl">Header Sections</h2>
                   </div>
                   <div className=" flex flex-col gap-6">

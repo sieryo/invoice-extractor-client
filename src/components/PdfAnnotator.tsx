@@ -11,10 +11,6 @@ import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 import { PdfDocumentLoading } from "./PdfDocumentLoading";
 import { ExportTouchable } from "./ExportTouchable";
 import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { Label } from "./ui/label";
-import { useReverseUploadStore } from "@/store/useReverseUploadStore";
-import { Switch } from "./ui/switch";
 import { DialogUpdateLawanTransaksi } from "./DialogUpdateLawanTransaksi";
 import { DialogRenameFaktur } from "./DialogRenameFaktur";
 
@@ -187,22 +183,22 @@ export const PDFAnnotator = () => {
   );
 };
 
-const ReverseUploadSwitch = () => {
-  const { isReverse, setIsReverse } = useReverseUploadStore();
+// const ReverseUploadSwitch = () => {
+//   const { isReverse, setIsReverse } = useReverseUploadStore();
 
-  return (
-    <div className="flex items-center rounded-lg border p-3 shadow-sm gap-10">
-      <Tooltip>
-        <TooltipTrigger>
-          <div className="space-y-0.5">
-            <Label>Reverse Upload file Order</Label>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          Activated: Bottom to Top; Not Activated: Top to Bottom
-        </TooltipContent>
-      </Tooltip>
-      <Switch checked={isReverse} onCheckedChange={setIsReverse} />
-    </div>
-  );
-};
+//   return (
+//     <div className="flex items-center rounded-lg border p-3 shadow-sm gap-10">
+//       <Tooltip>
+//         <TooltipTrigger>
+//           <div className="space-y-0.5">
+//             <Label>Reverse Upload file Order</Label>
+//           </div>
+//         </TooltipTrigger>
+//         <TooltipContent>
+//           Activated: Bottom to Top; Not Activated: Top to Bottom
+//         </TooltipContent>
+//       </Tooltip>
+//       <Switch checked={isReverse} onCheckedChange={setIsReverse} />
+//     </div>
+//   );
+// };

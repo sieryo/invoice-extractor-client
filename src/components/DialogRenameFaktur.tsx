@@ -21,7 +21,6 @@ export const DialogRenameFaktur = () => {
   const [files, setFiles] = useState<File[]>([]);
   const inputFileRef = useRef<HTMLInputElement>(null); // untuk reset input file
 
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFiles(Array.from(e.target.files));
@@ -79,28 +78,20 @@ export const DialogRenameFaktur = () => {
         }
       );
       console.log(response.data);
-      successMessage(`Berhasil di simpan!`);
+      successMessage(`Faktur renamed successfully!`);
       setFiles([]);
       setFolderName("Hasil");
       if (inputFileRef.current) inputFileRef.current.value = "";
     } catch (err: any) {
-      if (
-        err.response &&
-        err.response.data instanceof Blob &&
-        err.response.data.type === "application/json"
-      ) {
-        const reader = new FileReader();
-        reader.onload = function () {
-          const errorText = reader.result;
-          try {
-            // @ts-expect-error
-            const json = JSON.parse(errorText ?? "");
-            errorMessage(json.detail || "Unknown Error");
-          } catch (parseError) {
-            errorMessage("Error:" + errorText);
-          }
-        };
-        reader.readAsText(err.response.data);
+      console.log(err.response);
+      if (err.response && err.response.data.detail) {
+        const errorText = err.response.data.detail;
+        try {
+          const json = JSON.parse(errorText ?? "");
+          errorMessage(json.detail || "Unknown Error");
+        } catch (parseError) {
+          errorMessage(errorText);
+        }
       } else {
         alert("err: " + (err.message || "Terjadi kesalahan"));
       }
@@ -136,7 +127,7 @@ export const DialogRenameFaktur = () => {
             <DialogTitle>Form Rename Faktur</DialogTitle>
             <DialogDescription>
               Upload PDF dan beri nama folder output. Klik save untuk
-              melanjutkan.
+              melanjutkan. File akan disimpan di folder: "export/[output]"
             </DialogDescription>
           </DialogHeader>
 
@@ -154,20 +145,22 @@ export const DialogRenameFaktur = () => {
               )}
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="files">Upload PDF(s)</Label>
-              <Input
-                id="files"
-                type="file"
-                accept="application/pdf"
-                multiple
-                onChange={handleFileChange}
-                ref={inputFileRef}
-              />
-            </div>
+            {files.length <= 0 && (
+              <div className="grid gap-2">
+                <Label htmlFor="files">Upload PDF(s)</Label>
+                <Input
+                  id="files"
+                  type="file"
+                  accept="application/pdf"
+                  multiple
+                  onChange={handleFileChange}
+                  ref={inputFileRef}
+                />
+              </div>
+            )}
 
             {files.length > 0 && (
-              <div className="mt-2 border rounded-md p-3 bg-gray-50">
+              <div className="mt-2 border rounded-md p-3 bg-gray-50 overflow-hidden max-h-[300px] overflow-y-auto">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-semibold">File yang diupload:</h4>
                   <Button size="sm" variant="ghost" onClick={handleResetFiles}>
@@ -193,7 +186,6 @@ export const DialogRenameFaktur = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 };

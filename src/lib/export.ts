@@ -3,6 +3,7 @@ import axios from "axios";
 import type { PdfGroup } from "@/store/usePdfStore";
 import { loadPdfFile } from "./pdfFileStorage";
 import { errorMessage } from "@/utils/message";
+import { BASE_API_PATH } from "@/constants/api";
 
 function buildHeaderConfig(config: PdfConfig) {
   return {
@@ -111,7 +112,7 @@ export const handleExport = async (
 
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_API_BASE}/api/export`,
+      `${BASE_API_PATH}/export`,
       formData,
       {
         responseType: "blob",
