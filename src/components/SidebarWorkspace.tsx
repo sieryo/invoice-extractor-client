@@ -29,6 +29,8 @@ import { useRouter } from "@tanstack/react-router";
 import { DialogConfirm } from "./DialogConfirm";
 import { TrashIconButton } from "./icon/TrashIconButton";
 import { cn } from "@/lib/utils";
+import { BaseFolderUploader } from "./BaseFolderUploader";
+import { FolderUp } from "lucide-react";
 
 export const SidebarWorkspace = () => {
   const { groups, current, setGroups, getGroup, setPdfs, setCurrent } =
@@ -67,7 +69,7 @@ export const SidebarWorkspace = () => {
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
 
-    console.log("kesini!")
+    console.log("kesini!");
   };
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
@@ -93,9 +95,8 @@ export const SidebarWorkspace = () => {
       PdfStoreManager.addGroupWithPdfs(allFiles, groupIdentifier);
       successMessage("Folder uploaded successfully");
     } catch (err) {
-
     } finally {
-      setIsUserDragging(false)
+      setIsUserDragging(false);
     }
   };
 
@@ -219,12 +220,20 @@ export const SidebarWorkspace = () => {
           />
           <div>Workspace</div>
         </div>
-        <div className=" relative flex gap-2">
-          <TrashIconButton
-            onClick={() => {
-              setShowConfirm(true);
-            }}
-          />
+        <div className=" flex gap-3 items-center justify-center">
+          <div className=" relative flex gap-2 ">
+            <TrashIconButton
+              onClick={() => {
+                setShowConfirm(true);
+              }}
+            />
+          </div>
+          <div className=" relative flex gap-2 items-center ">
+            <div className="p-1.5 rounded-md  hover:bg-sky-100 transition-all duration-200 text-sky-500 hover:text-sky-600">
+              <BaseFolderUploader />
+              <FolderUp className=" w-5 h-5" />
+            </div>
+          </div>
         </div>
       </div>
       {groups.length == 0 ? (
@@ -241,8 +250,8 @@ export const SidebarWorkspace = () => {
           <div
             className={cn(" w-full h-full flex items-center justify-center")}
           >
-            <div className=" text-lg text-gray-800">
-              Drag folder with pdfs file here to begin
+            <div className=" text-lg text-gray-800 text-center">
+              Empty Workspace
             </div>
           </div>
         </div>
