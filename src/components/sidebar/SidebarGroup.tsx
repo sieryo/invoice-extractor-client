@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { usePdfStore, type PdfGroup } from "@/store/usePdfStore";
 import { ChevronDown, ChevronUp, Folder, Plus } from "lucide-react";
 import { SidebarOptions } from "./SidebarOptions";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -65,6 +65,12 @@ export const SidebarGroup = ({
   const handleDialogRename = () => {
     setIsDialogRenameOpen(true);
   };
+
+  useEffect(() => {
+    if (current?.groupId == group.id) {
+      setCollapsed(false)
+    }
+  }, [current?.pdfId])
 
   const handleDragEnter = (e: React.DragEvent) => {
     return handleBaseDrag(e, () => {
@@ -159,9 +165,9 @@ export const SidebarGroup = ({
       />
       <div
         className={cn(
-          "flex items-center group  rounded-t-lg  hover:bg-slate-200  text-xs font-bold uppercase text-gray-900",
-          selected && "bg-slate-200",
-          isDraggingToGroup && "bg-slate-300",
+          "flex items-center group  rounded-t-lg  hover:bg-gray-100  text-xs font-bold uppercase text-gray-900",
+          selected && "bg-gray-100",
+          isDraggingToGroup && "bg-blue-200",
         )}
       >
         <div className=" items-center">

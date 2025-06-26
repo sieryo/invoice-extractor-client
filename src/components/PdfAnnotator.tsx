@@ -5,14 +5,14 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 
 import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { DrawArea } from "./DrawArea";
-import { Minus, Plus } from "lucide-react";
+import { ArrowRight, Minus, Plus } from "lucide-react";
 
 import { useCurrentPdf } from "@/hooks/useCurrentPdf";
 import { PdfDocumentLoading } from "./PdfDocumentLoading";
 import { ExportTouchable } from "./ExportTouchable";
 import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
 import { DialogUpdateLawanTransaksi } from "./DialogUpdateLawanTransaksi";
-import { DialogRenameFaktur } from "./DialogRenameFaktur";
+import { ActionButton } from "./ActionButton";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
@@ -24,7 +24,7 @@ export const PDFAnnotator = () => {
 
   const Navbar = () => {
     return (
-      <div className="flex  p-1.5 items-center justify-between w-full bg-white border-b border-gray-200 mb-3">
+      <div className="flex  p-1.5 px-4 items-center justify-between w-full bg-white border-b border-gray-200 mb-3">
         <div className=" flex">
           {/* <ReverseUploadSwitch /> */}
 
@@ -44,9 +44,7 @@ export const PDFAnnotator = () => {
             <div>
               <DialogUpdateLawanTransaksi />
             </div>
-          </div>
-          <div className=" px-3 ">
-            <DialogRenameFaktur />
+            
           </div>
         </div>
 
@@ -60,9 +58,10 @@ export const PDFAnnotator = () => {
             }}
           >
             <div>
-              <div className="select-none p-2 px-6 text-gray-900 font-semibold rounded-md cursor-pointer">
+              <ActionButton>
                 Export
-              </div>
+                <ArrowRight className=" w-5 h-5" />
+              </ActionButton>
             </div>
           </ExportTouchable>
         </div>
@@ -92,9 +91,7 @@ export const PDFAnnotator = () => {
       </div> */}
         <Navbar />
         <div className=" w-full flex items-center justify-center h-screen  p-12">
-          <div className=" w-[60%] h-full border border-gray-300 flex items-center justify-center">
-            <p>File not selected</p>
-          </div>
+         
         </div>
       </div>
     );

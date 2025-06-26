@@ -16,6 +16,8 @@ import axios from "axios";
 import { errorMessage, successMessage } from "@/utils/message";
 import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
 import { BASE_API_PATH } from "@/constants/api";
+import { ArrowRight } from "lucide-react";
+import { ActionButton } from "./ActionButton";
 
 export const DialogRenameFaktur = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -83,7 +85,6 @@ export const DialogRenameFaktur = () => {
       setFolderName("Hasil");
       if (inputFileRef.current) inputFileRef.current.value = "";
     } catch (err: any) {
-      console.log(err.response);
       if (err.response && err.response.data.detail) {
         const errorText = err.response.data.detail;
         try {
@@ -120,7 +121,9 @@ export const DialogRenameFaktur = () => {
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline">Rename Faktur</Button>
+          <ActionButton>
+            Rename Faktur
+          </ActionButton>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] bg-white p-4 rounded-xl shadow-md">
           <DialogHeader>

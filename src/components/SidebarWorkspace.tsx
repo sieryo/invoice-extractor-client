@@ -20,11 +20,15 @@ import React, { useState } from "react";
 import { DropIndicator } from "./DropIndicator";
 import { SidebarGroup } from "./sidebar/SidebarGroup";
 import { SortableGroupWrapper } from "./SortableGroupWrapper";
-import { X } from "lucide-react";
 import { PdfStoreManager } from "@/managers/PdfStoreManager";
 import { handleActionWithToast } from "@/utils/withToast";
 import { getFolderNameFromPath, traverseFileTree } from "@/utils";
 import { successMessage } from "@/utils/message";
+import { BackButton } from "./BackButton";
+import { useRouter } from "@tanstack/react-router";
+import { DialogConfirm } from "./DialogConfirm";
+import { TrashIconButton } from "./icon/TrashIconButton";
+import { cn } from "@/lib/utils";
 
 export const SidebarWorkspace = () => {
   const { groups, current, setGroups, getGroup, setPdfs, setCurrent } =
@@ -34,34 +38,65 @@ export const SidebarWorkspace = () => {
 
   const [selectedGroupId, setSelectedGroupId] = useState("");
 
+  const [isUserDragging, setIsUserDragging] = useState(false);
+
   const sensors = useSensors(useSensor(PointerSensor));
+  const [showConfirm, setShowConfirm] = useState(false);
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.navigate({
+      to: "/",
+    });
+  };
 
   // DRAG N DROP FOLDER FROM LOCAL
 
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    setIsUserDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    setIsUserDragging(false);
+  };
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+
+    console.log("kesini!")
   };
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
 
-    const items = e.dataTransfer.items;
-    const files = Array.from(e.dataTransfer.files);
-    const pdfFiles = files.filter((f) => f.type === "application/pdf");
+    try {
+      const items = e.dataTransfer.items;
+      const files = Array.from(e.dataTransfer.files);
+      console.log(files);
+      const pdfFiles = files.filter((f) => f.type === "application/pdf");
 
-    if (pdfFiles.length != 0) return;
+      if (pdfFiles.length != 0) return;
 
-    const item = items[0];
-    const entry = item.webkitGetAsEntry?.();
+      const item = items[0];
+      const entry = item.webkitGetAsEntry?.();
 
-    const allFiles: File[] = await traverseFileTree(entry);
+      const allFiles: File[] = await traverseFileTree(entry);
 
-    if (allFiles.length <= 0) return;
+      if (allFiles.length <= 0) return;
 
-    // @ts-expect-error
-    const groupIdentifier = getFolderNameFromPath(allFiles[0].relativePath);
-    PdfStoreManager.addGroupWithPdfs(allFiles, groupIdentifier);
-    successMessage("Folder uploaded successfully");
+      // @ts-expect-error
+      const groupIdentifier = getFolderNameFromPath(allFiles[0].relativePath);
+      PdfStoreManager.addGroupWithPdfs(allFiles, groupIdentifier);
+      successMessage("Folder uploaded successfully");
+    } catch (err) {
+
+    } finally {
+      setIsUserDragging(false)
+    }
   };
 
   const handleGroupDragStart = (event: DragStartEvent) => {
@@ -168,116 +203,146 @@ export const SidebarWorkspace = () => {
 
   return (
     <div className="bg-white text-gray-900  h-full flex flex-col px-2   ">
+      <DialogConfirm
+        isOpen={showConfirm}
+        setIsOpen={setShowConfirm}
+        title="Delete ALL group?"
+        description="This action cannot be undone."
+        onConfirm={() => handleDeleteAllGroup()}
+      />
       <div className=" flex justify-between items-center px-4 py-2  ">
-        <div className=" text-lg font-semibold">Groups</div>
+        <div className=" text-lg font-semibold flex items-center  gap-4">
+          <BackButton
+            onClick={() => {
+              handleBack();
+            }}
+          />
+          <div>Workspace</div>
+        </div>
         <div className=" relative flex gap-2">
-          {/* <div>
-            <BaseFileUploader />
-            <Plus className=" w-6 h-6 text-gray-800" />
-          </div> */}
-          {/* <div>
-            <AddGroup />
-          </div> */}
-          <div>
-            <X
-              onClick={() => {
-                handleDeleteAllGroup();
-              }}
-              className=" w-6 h-6 text-red-500"
-            />
-          </div>
+          <TrashIconButton
+            onClick={() => {
+              setShowConfirm(true);
+            }}
+          />
         </div>
       </div>
-      <div
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        className="flex-1 overflow-y-auto overflow-x-hidden pb-10 mt-3"
-      >
-        <DndContext
-          collisionDetection={pointerWithin}
-          onDragStart={handleGroupDragStart}
-          onDragEnd={handleGroupDragEnd}
-          onDragOver={handleGroupDragOver}
-          sensors={sensors}
+      {groups.length == 0 ? (
+        <div
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          className={cn(
+            "flex-1 overflow-y-auto overflow-x-hidden pb-10 mt-3 transition ",
+            isUserDragging && " bg-slate-200"
+          )}
         >
-          <SortableContext
-            items={groups.map((g) => g.id)}
-            strategy={verticalListSortingStrategy}
+          <div
+            className={cn(" w-full h-full flex items-center justify-center")}
           >
-            {groups.map((group, idx) => {
-              const activeId = active ? active.id : "";
-              const overId = over ? over.id : "";
+            <div className=" text-lg text-gray-800">
+              Drag folder with pdfs file here to begin
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          className={cn(
+            "flex-1 overflow-y-auto overflow-x-hidden pb-10 mt-3 transition ",
+            isUserDragging && " bg-slate-200"
+          )}
+        >
+          <DndContext
+            collisionDetection={pointerWithin}
+            onDragStart={handleGroupDragStart}
+            onDragEnd={handleGroupDragEnd}
+            onDragOver={handleGroupDragOver}
+            sensors={sensors}
+          >
+            <SortableContext
+              items={groups.map((g) => g.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {groups.map((group, idx) => {
+                const activeId = active ? active.id : "";
+                const overId = over ? over.id : "";
 
-              const activeData = active?.data.current;
-              const overData = over?.data.current;
-              let activeType = activeData?.type;
-              let overType = overData?.type;
-              let placeIndicatorAbove = false;
-              let isOver = false;
+                const activeData = active?.data.current;
+                const overData = over?.data.current;
+                let activeType = activeData?.type;
+                let overType = overData?.type;
+                let placeIndicatorAbove = false;
+                let isOver = false;
 
-              // (Active type file to group yang berbeda)
-              // Menyalakan Drop indicator bawah folder
-              if (activeData?.type == "file" && overData?.type == "group") {
-                isOver = overId === group.id && activeData.groupId !== overId;
-              } else if (activeType == "group" && overType == "group") {
-                isOver = overId === group.id && activeId !== overId;
-                const activeIndex = getIndex(activeId.toString());
-                const overIndex = getIndex(overId.toString());
-                placeIndicatorAbove = activeIndex > overIndex;
-              }
+                // (Active type file to group yang berbeda)
+                // Menyalakan Drop indicator bawah folder
+                if (activeData?.type == "file" && overData?.type == "group") {
+                  isOver = overId === group.id && activeData.groupId !== overId;
+                } else if (activeType == "group" && overType == "group") {
+                  isOver = overId === group.id && activeId !== overId;
+                  const activeIndex = getIndex(activeId.toString());
+                  const overIndex = getIndex(overId.toString());
+                  placeIndicatorAbove = activeIndex > overIndex;
+                }
 
-              const isShowGroupDropIndicator =
-                isOver && activeType == "group" && overType == "group";
+                const isShowGroupDropIndicator =
+                  isOver && activeType == "group" && overType == "group";
 
-              return (
-                <React.Fragment key={group.id}>
-                  {isShowGroupDropIndicator && placeIndicatorAbove && (
-                    <DropIndicator />
-                  )}
-
-                  <SortableGroupWrapper group={group}>
-                    {({ setHandleRef, listeners, attributes }) => (
-                      <div>
-                        <SidebarGroup
-                          group={group}
-                          order={idx + 1}
-                          dragHandleProps={{
-                            setHandleRef,
-                            listeners,
-                            attributes,
-                          }}
-                          selected={selectedGroupId == group.id}
-                          setSelected={setSelectedGroupId}
-                          isDragging={group.id === activeId}
-                          isActive={current?.groupId === group.id}
-                          dropIndicator={{
-                            isOver: isOver,
-                            placement: placeIndicatorAbove ? "top" : "bottom",
-                            activeType: activeType,
-                            overType: overType,
-                          }}
-                          // @ts-expect-error
-                          activeFileId={
-                            activeData?.type === "file" ? active?.id : null
-                          }
-                          // @ts-expect-error
-                          overFileId={
-                            overData?.type === "file" ? over?.id : null
-                          }
-                        />
-                      </div>
+                return (
+                  <React.Fragment key={group.id}>
+                    {isShowGroupDropIndicator && placeIndicatorAbove && (
+                      <DropIndicator />
                     )}
-                  </SortableGroupWrapper>
 
-                  {isShowGroupDropIndicator && !placeIndicatorAbove && (
-                    <DropIndicator />
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </SortableContext>
-        </DndContext>
-      </div>
+                    <SortableGroupWrapper group={group}>
+                      {({ setHandleRef, listeners, attributes }) => (
+                        <div>
+                          <SidebarGroup
+                            group={group}
+                            order={idx + 1}
+                            dragHandleProps={{
+                              setHandleRef,
+                              listeners,
+                              attributes,
+                            }}
+                            selected={selectedGroupId == group.id}
+                            setSelected={setSelectedGroupId}
+                            isDragging={group.id === activeId}
+                            isActive={current?.groupId === group.id}
+                            dropIndicator={{
+                              isOver: isOver,
+                              placement: placeIndicatorAbove ? "top" : "bottom",
+                              activeType: activeType,
+                              overType: overType,
+                            }}
+                            // @ts-expect-error
+                            activeFileId={
+                              activeData?.type === "file" ? active?.id : null
+                            }
+                            // @ts-expect-error
+                            overFileId={
+                              overData?.type === "file" ? over?.id : null
+                            }
+                          />
+                        </div>
+                      )}
+                    </SortableGroupWrapper>
+
+                    {isShowGroupDropIndicator && !placeIndicatorAbove && (
+                      <DropIndicator />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </SortableContext>
+          </DndContext>
+        </div>
+      )}
     </div>
   );
 };

@@ -61,8 +61,8 @@ export const SidebarItems = ({
         onMouseDown={handleClickItem}
         className={cn(
           "items-center justify-between pl-8 pr-1 py-1.5 rounded-sm group cursor-default relative ",
-          isActive && "bg-slate-300",
-          !isDragging && "hover:bg-slate-300"
+          isActive && "bg-gray-300",
+          !isDragging && "hover:bg-gray-200"
         )}
       >
         <div
