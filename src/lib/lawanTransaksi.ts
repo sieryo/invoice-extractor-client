@@ -1,6 +1,6 @@
-import { BASE_API_PATH } from "@/constants/api";
 import { handleActionWithToast } from "@/utils/withToast";
 import axios from "axios";
+import { BASE_API_PATH } from "./constants";
 
 type OnUpdateCallback = () => void;
 
@@ -20,15 +20,11 @@ export const handleUpdateLawanTransaksi = async (
   const formData = buildFormData(file);
 
   try {
-    await axios.post(
-      `${BASE_API_PATH}/update-lawan-transaksi`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    await axios.post(`${BASE_API_PATH}/update-lawan-transaksi`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   } catch (err: any) {
     throw err;
   } finally {

@@ -15,9 +15,8 @@ import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { errorMessage, successMessage } from "@/utils/message";
 import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
-import { BASE_API_PATH } from "@/constants/api";
-import { ArrowRight } from "lucide-react";
 import { ActionButton } from "./ActionButton";
+import { BASE_API_PATH } from "@/lib/constants";
 
 export const DialogRenameFaktur = () => {
   const [files, setFiles] = useState<File[]>([]);

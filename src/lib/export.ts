@@ -3,7 +3,7 @@ import axios from "axios";
 import type { PdfGroup } from "@/store/usePdfStore";
 import { loadPdfFile } from "./pdfFileStorage";
 import { errorMessage } from "@/utils/message";
-import { BASE_API_PATH } from "@/constants/api";
+import { BASE_API_PATH } from "./constants";
 
 function buildHeaderConfig(config: PdfConfig) {
   return {
