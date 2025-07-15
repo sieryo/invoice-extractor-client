@@ -5,10 +5,10 @@ import { usePdfStore, type PdfGroup } from "@/store/usePdfStore";
 import { useReverseUploadStore } from "@/store/useReverseUploadStore";
 
 export class PdfStoreManager {
-  public static getGroupById(groudId: string): PdfGroup | undefined {
+  public static getGroupById(groupId: string): PdfGroup | undefined {
     const getGroup = usePdfStore.getState().getGroup;
 
-    return getGroup(groudId);
+    return getGroup(groupId);
   }
   public static async deleteGroup(groupId: string): Promise<void> {
     const { setGroups, groups, current } = usePdfStore.getState();
@@ -46,7 +46,7 @@ export class PdfStoreManager {
   public static async addGroupWithPdfs(files: any[], identifier: string) {
     const addGroupWithPdfs = usePdfStore.getState().addGroupWithPdfs;
 
-    addGroupWithPdfs(files, identifier);
+    await addGroupWithPdfs(files, identifier);
   }
 
   public static async addPdfs(files: any[], groupId: string) {
@@ -75,10 +75,10 @@ export class PdfStoreManager {
     setPdfs(groupId, newPdfs);
   }
 
-  public static updateConfig(groudId: string, config: PdfConfig) {
+  public static updateConfig(groupId: string, config: PdfConfig) {
     const updateConfig = usePdfStore.getState().updateConfig;
 
-    return updateConfig(groudId, config);
+    return updateConfig(groupId, config);
   }
 
   public static async setCurrent(pdfId: string, groupId: string) {
