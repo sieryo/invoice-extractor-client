@@ -1,5 +1,6 @@
 import { handleExport } from "@/lib/export";
 import { usePdfStore } from "@/store/usePdfStore";
+import type { AxiosResponse } from "axios";
 
 export const ExportTouchable = ({
   children,
@@ -8,12 +9,14 @@ export const ExportTouchable = ({
 }: {
   children: React.ReactNode;
   onBeforeExport?: () => void;
-  onAfterExport?: () => void;
+  onAfterExport?: (response: AxiosResponse<any,any>) => void;
 }) => {
   const { groups } = usePdfStore();
 
   const exportToExcel = async () => {
     if (groups.length <= 0) return;
+
+
     await handleExport(groups, onBeforeExport, onAfterExport);
   };
 

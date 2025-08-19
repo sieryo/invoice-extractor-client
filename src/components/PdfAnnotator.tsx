@@ -13,59 +13,73 @@ import { ExportTouchable } from "./ExportTouchable";
 import { useFullScreenLoadingStore } from "@/store/useFullScreenLoadingStore";
 import { DialogUpdateLawanTransaksi } from "./DialogUpdateLawanTransaksi";
 import { ActionButton } from "./ActionButton";
+import { DialogDetailExport } from "./DialogDetailExport";
+import type { AxiosResponse } from "axios";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 export const PDFAnnotator = () => {
   const { file, id, updateDimensions, group } = useCurrentPdf();
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [response, setResponse] = useState<AxiosResponse<any, any>>();
+
   const [scale, setScale] = useState(1);
   const { setIsLoading } = useFullScreenLoadingStore();
 
   const Navbar = () => {
     return (
-      <div className="flex  p-1.5 px-4 items-center justify-between w-full bg-white border-b border-gray-200 mb-3">
-        <div className=" flex">
-          {/* <ReverseUploadSwitch /> */}
+      <>
+        <DialogDetailExport
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          response={response}
+        />
+        <div className="flex  p-1.5 px-4 items-center justify-between w-full bg-white border-b border-gray-200 mb-3">
+          <div className=" flex">
+            {/* <ReverseUploadSwitch /> */}
 
-          <div className="flex justify-center items-center gap-3">
-            <div
-              onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}
-              className="p-2 font-semibold rounded-md cursor-pointer"
+            <div className="flex justify-center items-center gap-3">
+              <div
+                onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}
+                className="p-2 font-semibold rounded-md cursor-pointer"
+              >
+                <Minus className="w-5 h-5 text-gray-900" />
+              </div>
+              <div
+                onClick={() => setScale((s) => s + 0.25)}
+                className="p-2 font-semibold rounded-md cursor-pointer"
+              >
+                <Plus className="w-5 h-5 text-gray-900" />
+              </div>
+              <div>
+                <DialogUpdateLawanTransaksi />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <ExportTouchable
+              onBeforeExport={() => {
+                setIsLoading(true);
+              }}
+              onAfterExport={(response) => {
+                setIsLoading(false);
+                setResponse(response);
+                setIsOpen(true);
+              }}
             >
-              <Minus className="w-5 h-5 text-gray-900" />
-            </div>
-            <div
-              onClick={() => setScale((s) => s + 0.25)}
-              className="p-2 font-semibold rounded-md cursor-pointer"
-            >
-              <Plus className="w-5 h-5 text-gray-900" />
-            </div>
-            <div>
-              <DialogUpdateLawanTransaksi />
-            </div>
-            
+              <div>
+                <ActionButton>
+                  Export
+                  <ArrowRight className=" w-5 h-5" />
+                </ActionButton>
+              </div>
+            </ExportTouchable>
           </div>
         </div>
-
-        <div>
-          <ExportTouchable
-            onBeforeExport={() => {
-              setIsLoading(true);
-            }}
-            onAfterExport={() => {
-              setIsLoading(false);
-            }}
-          >
-            <div>
-              <ActionButton>
-                Export
-                <ArrowRight className=" w-5 h-5" />
-              </ActionButton>
-            </div>
-          </ExportTouchable>
-        </div>
-      </div>
+      </>
     );
   };
 
@@ -90,9 +104,7 @@ export const PDFAnnotator = () => {
         </div>
       </div> */}
         <Navbar />
-        <div className=" w-full flex items-center justify-center h-screen  p-12">
-         
-        </div>
+        <div className=" w-full flex items-center justify-center h-screen  p-12"></div>
       </div>
     );
 

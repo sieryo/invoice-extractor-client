@@ -1,5 +1,5 @@
 import type { PdfConfig } from "@/models/pdfConfig";
-import axios from "axios";
+import axios, { type AxiosResponse } from "axios";
 import type { PdfGroup } from "@/store/usePdfStore";
 import { loadPdfFile } from "./pdfFileStorage";
 import { errorMessage } from "@/utils/message";
@@ -60,8 +60,7 @@ async function buildFormDataMulti(groups: PdfGroup[]) {
   return formData;
 }
 
-
-function triggerDownload(response: any) {
+function _triggerDownload(response: any) {
   const url = window.URL.createObjectURL(new Blob([response.data]));
   const exportedName = response.headers.get("X-Exported-Filename");
 
@@ -73,6 +72,10 @@ function triggerDownload(response: any) {
   document.body.appendChild(link);
   link.click();
   link.remove();
+}
+
+export function triggerDownload(response: any) {
+  _triggerDownload(response);
 }
 
 function handleErrorResponse(err: any) {
@@ -101,7 +104,7 @@ function handleErrorResponse(err: any) {
 export const handleExport = async (
   groups: PdfGroup[],
   onBeforeExport?: () => void,
-  onAfterExport?: () => void
+  onAfterExport?: (response: AxiosResponse<any, any>) => void
 ) => {
   if (onBeforeExport) {
     onBeforeExport();
@@ -109,24 +112,29 @@ export const handleExport = async (
 
   const formData = await buildFormDataMulti(groups);
 
-
   try {
-    const response = await axios.post(
-      `${BASE_API_PATH}/export`,
-      formData,
-      {
-        responseType: "blob",
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await axios.post(`${BASE_API_PATH}/export`, formData, {
+      responseType: "blob",
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
     triggerDownload(response);
+
+    if (onAfterExport) onAfterExport(response);
+
+    return { response };
   } catch (err: any) {
     console.error("Upload error:", err);
     handleErrorResponse(err);
-  } finally {
-    if (onAfterExport) onAfterExport();
+
+    const response = err?.response;
+
+    if (onAfterExport && response) {
+      onAfterExport(response);
+    }
+
+    return { response };
   }
 };
