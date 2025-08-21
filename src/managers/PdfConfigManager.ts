@@ -7,9 +7,24 @@ import {
 } from "@/models/pdfConfig"; // sesuaikan dengan path kamu
 
 export class PdfConfigManager {
-
   static generate(): PdfConfig {
     const fields: FieldPdfConfig[] = [
+      {
+        name: "no_order",
+        label: "No Order",
+        classified: {
+          method: ClassifiedTypeEnum.KEYWORD,
+          data: "No. Order",
+        },
+      },
+      {
+        name: "po_number",
+        label: "Po Number",
+        classified: {
+          method: ClassifiedTypeEnum.KEYWORD,
+          data: "Po. Number",
+        },
+      },
       {
         name: "invoice_number",
         label: "Invoice Number",
