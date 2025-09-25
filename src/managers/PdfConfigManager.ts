@@ -10,14 +10,6 @@ export class PdfConfigManager {
   static generate(): PdfConfig {
     const fields: FieldPdfConfig[] = [
       {
-        name: "no_order",
-        label: "No Order",
-        classified: {
-          method: ClassifiedTypeEnum.KEYWORD,
-          data: "No. Order",
-        },
-      },
-      {
         name: "po_number",
         label: "Po Number",
         classified: {
